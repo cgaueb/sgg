@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "GLbackend.h"
 #include <iostream>
 #include <string>
