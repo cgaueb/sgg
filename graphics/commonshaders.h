@@ -1,6 +1,8 @@
 #pragma once
 
 const char* __PrimitivesVertexShader = R"(
+#version 120
+
 attribute vec4 coord;
 varying vec2 texcoord;
 uniform mat4 MV;

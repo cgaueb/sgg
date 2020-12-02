@@ -4,7 +4,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 const char* __DefaultVertexShader = R"glsl(
-    #version 150 core
+	#version 120
     in vec3 position;
 	void main()
     {
@@ -14,7 +14,7 @@ const char* __DefaultVertexShader = R"glsl(
 
 
 const char* __DefaultFragmentShader = R"glsl(
-    #version 150 core
+	#version 120
     out vec4 fragcolor;
     void main()
     {
