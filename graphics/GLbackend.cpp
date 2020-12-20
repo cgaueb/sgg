@@ -10,6 +10,14 @@
 #include "commonshaders.h"
 #include "graphics.h"
 
+#ifdef __APPLE__
+#define sggBindVertexArray glBindVertexArrayAPPLE
+#define sggGenVertexArrays glGenVertexArraysAPPLE
+#else
+#define sggBindVertexArray glBindVertexArray
+#define sggGenVertexArrays glGenVertexArrays
+#endif
+
 namespace graphics
 {
 
@@ -310,32 +318,33 @@ namespace graphics
 			sector_vertices[2 * CURVE_SUBDIVS - i - 1][2] = s;
 			sector_vertices[2 * CURVE_SUBDIVS - i - 1][3] = 1.0f;
 		}
-		glGenVertexArrays(1, &m_sector_vao);
-		glBindVertexArray(m_sector_vao);
+
+		sggGenVertexArrays(1, &m_sector_vao);
+		sggBindVertexArray(m_sector_vao);
 		glGenBuffers(1, &m_sector_vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, m_sector_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof sector_vertices, sector_vertices, GL_DYNAMIC_DRAW);
 
-		glGenVertexArrays(1, &m_sector_outline_vao);
-		glBindVertexArray(m_sector_outline_vao);
+		sggGenVertexArrays(1, &m_sector_outline_vao);
+		sggBindVertexArray(m_sector_outline_vao);
 		glGenBuffers(1, &m_sector_outline_vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, m_sector_outline_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof sector_outline_vertices, sector_outline_vertices, GL_DYNAMIC_DRAW);
 
-		glGenVertexArrays(1, &m_line_vao);
-		glBindVertexArray(m_line_vao);
+		sggGenVertexArrays(1, &m_line_vao);
+		sggBindVertexArray(m_line_vao);
 		glGenBuffers(1, &m_line_vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, m_line_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof line, line, GL_DYNAMIC_DRAW);
 		
-		glGenVertexArrays(1, &m_rect_vao);
-		glBindVertexArray(m_rect_vao);
+		sggGenVertexArrays(1, &m_rect_vao);
+		sggBindVertexArray(m_rect_vao);
 		glGenBuffers(1, &m_rect_vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof box, box, GL_STATIC_DRAW);
 
-		glGenVertexArrays(1, &m_rect_outline_vao);
-		glBindVertexArray(m_rect_outline_vao);
+		sggGenVertexArrays(1, &m_rect_outline_vao);
+		sggBindVertexArray(m_rect_outline_vao);
 		glGenBuffers(1, &m_rect_outline_vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, m_rect_outline_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof box_outline, box_outline, GL_STATIC_DRAW);
@@ -393,7 +402,7 @@ namespace graphics
 				m_flat_shader["has_texture"] = 0;
 
 			unsigned int attrib_flat_position = m_flat_shader.getAttributeLocation("coord");
-			glBindVertexArray(m_rect_vao); 
+			sggBindVertexArray(m_rect_vao); 
 			glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
 			glEnableVertexAttribArray(attrib_flat_position);
 			glVertexAttribPointer(attrib_flat_position, 4, GL_FLOAT, GL_FALSE, 0, 0);
@@ -412,7 +421,7 @@ namespace graphics
 			m_flat_shader["MV"] = mat;
 			m_flat_shader["has_texture"] = 0;
 			glLineWidth(brush.outline_width);
-			glBindVertexArray(m_rect_outline_vao);
+			sggBindVertexArray(m_rect_outline_vao);
 			glBindBuffer(GL_ARRAY_BUFFER, m_rect_outline_vbo);
 			unsigned int attrib_flat_position = m_flat_shader.getAttributeLocation("coord");
 			glEnableVertexAttribArray(attrib_flat_position);
@@ -435,7 +444,7 @@ namespace graphics
 			{ x_2, y_2, 0.1f, 1.0f},
 		};
 
-		glBindVertexArray(m_line_vao);
+		sggBindVertexArray(m_line_vao);
 		glBindBuffer(GL_ARRAY_BUFFER, m_line_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof line, line, GL_DYNAMIC_DRAW);
 		unsigned int attrib_flat_position = m_flat_shader.getAttributeLocation("coord");
@@ -515,7 +524,7 @@ namespace graphics
 			else
 				m_flat_shader["has_texture"] = 0;
 
-			glBindVertexArray(m_sector_vao);
+			sggBindVertexArray(m_sector_vao);
 			glBindBuffer(GL_ARRAY_BUFFER, m_sector_vbo);
 			glBufferData(GL_ARRAY_BUFFER, sizeof sector_vertices, sector_vertices, GL_DYNAMIC_DRAW);
 			unsigned int attrib_flat_position = m_flat_shader.getAttributeLocation("coord");
@@ -535,7 +544,7 @@ namespace graphics
 			m_flat_shader["has_texture"] = 0;
 			glLineWidth(brush.outline_width);
 			
-			glBindVertexArray(m_sector_outline_vao);
+			sggBindVertexArray(m_sector_outline_vao);
 			glBindBuffer(GL_ARRAY_BUFFER, m_sector_outline_vbo);
 			glBufferData(GL_ARRAY_BUFFER, sizeof sector_outline_vertices, sector_outline_vertices, GL_DYNAMIC_DRAW);
 			unsigned int attrib_flat_position = m_flat_shader.getAttributeLocation("coord");

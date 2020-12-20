@@ -4,6 +4,14 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
 
+#ifdef __APPLE__
+#define sggBindVertexArray glBindVertexArrayAPPLE
+#define sggGenVertexArrays glGenVertexArraysAPPLE
+#else
+#define sggBindVertexArray glBindVertexArray
+#define sggGenVertexArrays glGenVertexArrays
+#endif
+
 const char* __FontVertexShader = R"(
 #version 120
 
@@ -53,8 +61,8 @@ bool FontLib::init()
 	
 	unsigned int attrib_position = m_font_shader.getAttributeLocation("coord");
 		
-	glGenVertexArrays(1, &m_font_vao);
-	glBindVertexArray(m_font_vao);
+	sggGenVertexArrays(1, &m_font_vao);
+	sggBindVertexArray(m_font_vao);
 		
 	glGenBuffers(1, &m_font_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_font_vbo);
@@ -90,13 +98,19 @@ void FontLib::drawText(TextRecord entry)
 	Font font = m_curr_font->second;
 	FT_GlyphSlot g = font.face->glyph;
 
-	glFrontFace(GL_CW);
+#ifndef __APPLE__
+	//glFrontFace(GL_CW);
+#endif
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, font.font_tex);
 	static int c = 0;
 
-	
-	m_font_shader["tex"] = GL_TEXTURE0;
+	m_font_shader.use();
+
+	m_font_shader["tex"] = 0;
 	
 	m_font_shader["color1"] = entry.color1;
 	m_font_shader["color2"] = (entry.use_gradient? entry.color2 : entry.color1);
@@ -137,10 +151,9 @@ void FontLib::drawText(TextRecord entry)
 		m_font_shader["modelview"] = glm::translate(glm::vec3(entry.pos.x, entry.pos.y, 0.0f)) * entry.mv;
 
 
-		glBindVertexArray(m_font_vao);
+		sggBindVertexArray(m_font_vao);
 		glBindBuffer(GL_ARRAY_BUFFER, m_font_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof box, box, GL_DYNAMIC_DRAW);
-		
 		
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		x += std::max(w+ entry.size.x*0.05f, entry.size.x*0.15f);
