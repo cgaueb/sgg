@@ -35,7 +35,7 @@ echo Compiling with Visual Studio %STUDIO_VERSION% %STUDIO_EDITION%
 
 call "%STUDIO_PATH%\%STUDIO_VERSION%\%STUDIO_EDITION%\VC\Auxiliary\Build\vcvars64.bat"
 
-set INCLUDE_PATH=/Igraphics /I3rdparty/include
+set INCLUDE_PATH=/I. /I3rdparty/include
 set BUILD_PATH=build\Release
 set BUILD_PATH_DEBUG=build\Debug
 set OUT_PATH=bin

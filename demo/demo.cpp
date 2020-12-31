@@ -2,7 +2,7 @@
 #include <random>
 #include <string>
 
-#include "graphics.h"
+#include <sgg/graphics.h>
 
 #include "vecmath.h"
 

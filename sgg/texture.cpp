@@ -1,5 +1,5 @@
-#include "texture.h"
-#include "lodepng.h"
+#include <sgg/texture.h>
+#include <sgg/lodepng.h>
 #include <vector>
 #include <cmath>
 

@@ -1,5 +1,5 @@
-#include "graphics.h"
-#include "GLbackend.h"
+#include <sgg/graphics.h>
+#include <sgg/GLbackend.h>
 
 
 static graphics::GLBackend * engine = nullptr;

@@ -2,7 +2,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "GL/glew.h"
-#include "shader.h"
+#include "sgg/shader.h"
 #include <string>
 #include <vector>
 #include <unordered_map>

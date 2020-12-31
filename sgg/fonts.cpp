@@ -1,8 +1,8 @@
 
-#include "fonts.h"
+#include <sgg/fonts.h>
 #include <algorithm>
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/transform.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 
 #ifdef __APPLE__
 #define sggBindVertexArray glBindVertexArrayAPPLE

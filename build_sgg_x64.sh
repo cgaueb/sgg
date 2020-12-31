@@ -16,24 +16,24 @@ mkdir -p $BUILD_PATH_DEBUG
 mkdir -p $BUILD_PATH/sgg
 mkdir -p $BUILD_PATH_DEBUG/sgg
 
-$CC -c $CFLAGS -I3rdparty/include graphics/graphics.cpp -o $BUILD_PATH/sgg/graphics.o
-$CC -c $CFLAGS -I3rdparty/include graphics/GLbackend.cpp -o $BUILD_PATH/sgg/GLbackend.o
-$CC -c $CFLAGS -I3rdparty/include graphics/shader.cpp -o $BUILD_PATH/sgg/shader.o
-$CC -c $CFLAGS -I3rdparty/include graphics/texture.cpp -o $BUILD_PATH/sgg/texture.o
-$CC -c $CFLAGS -I3rdparty/include graphics/audio.cpp -o $BUILD_PATH/sgg/audio.o
-$CC -c $CFLAGS -I3rdparty/include graphics/AudioManager.cpp -o $BUILD_PATH/sgg/AudioManager.o
-$CC -c $CFLAGS -I3rdparty/include graphics/lodepng.cpp -o $BUILD_PATH/sgg/lodepng.o
-$CC -c $CFLAGS -I3rdparty/include graphics/fonts.cpp -o $BUILD_PATH/sgg/fonts.o
+$CC -c $CFLAGS -I. -I3rdparty/include sgg/graphics.cpp -o $BUILD_PATH/sgg/graphics.o
+$CC -c $CFLAGS -I. -I3rdparty/include sgg/GLbackend.cpp -o $BUILD_PATH/sgg/GLbackend.o
+$CC -c $CFLAGS -I. -I3rdparty/include sgg/shader.cpp -o $BUILD_PATH/sgg/shader.o
+$CC -c $CFLAGS -I. -I3rdparty/include sgg/texture.cpp -o $BUILD_PATH/sgg/texture.o
+$CC -c $CFLAGS -I. -I3rdparty/include sgg/audio.cpp -o $BUILD_PATH/sgg/audio.o
+$CC -c $CFLAGS -I. -I3rdparty/include sgg/AudioManager.cpp -o $BUILD_PATH/sgg/AudioManager.o
+$CC -c $CFLAGS -I. -I3rdparty/include sgg/lodepng.cpp -o $BUILD_PATH/sgg/lodepng.o
+$CC -c $CFLAGS -I. -I3rdparty/include sgg/fonts.cpp -o $BUILD_PATH/sgg/fonts.o
 
 $AR rcs $LIB_PATH/libsgg.a $BUILD_PATH/sgg/*.o
 
-$CC -c $CFLAGS_DEBUG -I3rdparty/include graphics/graphics.cpp -o $BUILD_PATH_DEBUG/sgg/graphics.o
-$CC -c $CFLAGS_DEBUG -I3rdparty/include graphics/GLbackend.cpp -o $BUILD_PATH_DEBUG/sgg/GLbackend.o
-$CC -c $CFLAGS_DEBUG -I3rdparty/include graphics/shader.cpp -o $BUILD_PATH_DEBUG/sgg/shader.o
-$CC -c $CFLAGS_DEBUG -I3rdparty/include graphics/texture.cpp -o $BUILD_PATH_DEBUG/sgg/texture.o
-$CC -c $CFLAGS_DEBUG -I3rdparty/include graphics/audio.cpp -o $BUILD_PATH_DEBUG/sgg/audio.o
-$CC -c $CFLAGS_DEBUG -I3rdparty/include graphics/AudioManager.cpp -o $BUILD_PATH_DEBUG/sgg/AudioManager.o
-$CC -c $CFLAGS_DEBUG -I3rdparty/include graphics/lodepng.cpp -o $BUILD_PATH_DEBUG/sgg/lodepng.o
-$CC -c $CFLAGS_DEBUG -I3rdparty/include graphics/fonts.cpp -o $BUILD_PATH_DEBUG/sgg/fonts.o
+$CC -c $CFLAGS_DEBUG -I. -I3rdparty/include sgg/graphics.cpp -o $BUILD_PATH_DEBUG/sgg/graphics.o
+$CC -c $CFLAGS_DEBUG -I. -I3rdparty/include sgg/GLbackend.cpp -o $BUILD_PATH_DEBUG/sgg/GLbackend.o
+$CC -c $CFLAGS_DEBUG -I. -I3rdparty/include sgg/shader.cpp -o $BUILD_PATH_DEBUG/sgg/shader.o
+$CC -c $CFLAGS_DEBUG -I. -I3rdparty/include sgg/texture.cpp -o $BUILD_PATH_DEBUG/sgg/texture.o
+$CC -c $CFLAGS_DEBUG -I. -I3rdparty/include sgg/audio.cpp -o $BUILD_PATH_DEBUG/sgg/audio.o
+$CC -c $CFLAGS_DEBUG -I. -I3rdparty/include sgg/AudioManager.cpp -o $BUILD_PATH_DEBUG/sgg/AudioManager.o
+$CC -c $CFLAGS_DEBUG -I. -I3rdparty/include sgg/lodepng.cpp -o $BUILD_PATH_DEBUG/sgg/lodepng.o
+$CC -c $CFLAGS_DEBUG -I. -I3rdparty/include sgg/fonts.cpp -o $BUILD_PATH_DEBUG/sgg/fonts.o
 
 $AR rcs $LIB_PATH/libsggd.a $BUILD_PATH_DEBUG/sgg/*.o

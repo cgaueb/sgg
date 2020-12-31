@@ -4,13 +4,13 @@
 #include <SDL2/SDL.h>
 #include <string>
 #include <thread>
-#include "shader.h"
-#include "fonts.h"
+#include <sgg/shader.h>
+#include <sgg/fonts.h>
 #include <functional>
 #include <glm/vec3.hpp>
-#include "scancodes.h"
-#include "texture.h"
-#include "AudioManager.h"
+#include <sgg/scancodes.h>
+#include <sgg/texture.h>
+#include <sgg/AudioManager.h>
 
 #define SGG_CHECK_GL() do {GLenum err;while((err = glGetError()) != GL_NO_ERROR){ printf("Error %s %d\n", (const char*)glewGetErrorString(err), err);exit(0);}printf("Pass\n");} while(0);
 

@@ -1,14 +1,14 @@
 #include <cstring>
 
-#include "GLbackend.h"
+#include <sgg/GLbackend.h>
 #include <iostream>
 #include <string>
 #include <chrono>
 #include <cstdint>
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/transform.hpp"
-#include "commonshaders.h"
-#include "graphics.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+#include <sgg/commonshaders.h>
+#include <sgg/graphics.h>
 
 #ifdef __APPLE__
 #define sggBindVertexArray glBindVertexArrayAPPLE

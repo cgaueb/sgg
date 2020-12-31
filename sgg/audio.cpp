@@ -22,7 +22,7 @@
 #include <memory.h>
 #include <SDL2/SDL.h>
 
-#include "audio.h"
+#include <sgg/audio.h>
 
 /*
  * Native WAVE format
