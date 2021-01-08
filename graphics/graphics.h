@@ -243,6 +243,30 @@ namespace graphics
 	*/
 	void setFullScreen(bool fs);
 	
+	/** Converts the horizontal window coordinate of a point to the corresponding canvas coordinate.
+
+		This function is useful for translating window coordinates (e.g. from the MouseState reported position) to the canvas space.
+
+		\param x is the window x coordinate to convert.
+		\param clamped specifies whether the coordinates reported are clamped to the extents of the canvas.
+		\return the horizontal coordinate in canvas units.
+
+		\see windowToCanvasY
+	*/
+	float windowToCanvasX(float x, bool clamped = true);
+
+	/** Converts the vertical window coordinate of a point to the corresponding canvas coordinate.
+
+		This function is useful for translating window coordinates (e.g. from the MouseState reported position) to the canvas space.
+
+		\param y is the window y coordinate to convert.
+		\param clamped specifies whether the coordinates reported are clamped to the extents of the canvas.
+		\return the vertical coordinate in canvas units.
+
+		\see windowToCanvasX
+	*/
+	float windowToCanvasY(float y, bool clamped = true);
+
 	/** Specifies a user-provided pointer to be stored within the SGG Engine.
 
 	Typically, at the start of the application the user creates a class that holds the application's state. A pointer to this class can be passed to setUserData(). At any later point in the application's lifecycle, the stored pointer can be retrieved using getUserData(). This is very useful for retreiving application data during callbacks for update, draw and resize. 

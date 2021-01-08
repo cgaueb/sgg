@@ -64,6 +64,8 @@ namespace graphics
 		GLuint		m_sector_outline_vbo;
 		GLuint		m_sector_outline_vao;
 
+		glm::vec4	m_window_to_canvas_factors;
+
 		AudioManager * m_audio = nullptr;
 
 		TextureManager textures;
@@ -111,6 +113,8 @@ namespace graphics
 		bool processMessages();
 		virtual void update(float delta_time = 0.0f);
 		virtual void resize(int w, int h);
+		float WindowToCanvasX(float x, bool clamped = true);
+		float WindowToCanvasY(float y, bool clamped = true);
 		virtual void draw();
 		virtual ~GLBackend();
 		void makeCurrent();

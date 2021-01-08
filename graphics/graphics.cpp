@@ -122,6 +122,16 @@ namespace graphics
 		engine->setFullscreen(fs);
 	}
 
+	float windowToCanvasX(float x, bool clamped)
+	{
+		return engine->WindowToCanvasX(x, clamped);
+	}
+
+	float windowToCanvasY(float y, bool clamped)
+	{
+		return engine->WindowToCanvasY(y, clamped);
+	}
+
 	void setDrawFunction(std::function<void()> fdraw)
 	{
 		engine->setDrawCallback(fdraw);

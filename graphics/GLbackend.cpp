@@ -674,10 +674,54 @@ namespace graphics
 			m_canvas = glm::vec4(0, 0, m_width, m_height);
 		else
 			m_canvas = m_requested_canvas;
+
+		float c_w = m_canvas.z;
+		float c_h = m_canvas.w;
+		float cr = c_w / c_h;
+		float wr = m_width / (float)m_height;
+
+		// calculate window to canvas unit conversion ratios
+		if (m_canvas_mode == CANVAS_SCALE_FIT)
+		{
+			if (cr > wr)
+			{
+				m_window_to_canvas_factors.x = c_w / m_width;
+				m_window_to_canvas_factors.y = 0.0f;
+				m_window_to_canvas_factors.z = c_w / m_width;
+				m_window_to_canvas_factors.w = c_h / 2.0f - 0.5 * m_height * c_w / m_width;
+			}
+			else
+			{
+				m_window_to_canvas_factors.z = c_h / m_height;
+				m_window_to_canvas_factors.w = 0.0f;
+				m_window_to_canvas_factors.x = c_h / m_height;
+				m_window_to_canvas_factors.y = c_w / 2.0f - 0.5 * m_width * c_h / m_height;
+			}
+		}
+		else 
+		{
+			m_window_to_canvas_factors.x = c_w / m_width;
+			m_window_to_canvas_factors.y = 0.0f;
+			m_window_to_canvas_factors.z = c_h / m_height;
+			m_window_to_canvas_factors.w = 0.0f;
+		}
+
 		computeProjection();
 		glViewport(0, 0, m_width, m_height);
 		//SDL_Delay(100);
 		draw();
+	}
+
+	float GLBackend::WindowToCanvasX(float x, bool clamped)
+	{
+		float coord = m_window_to_canvas_factors.x*x + m_window_to_canvas_factors.y;
+		return clamped?glm::clamp(coord, 0.0f, m_canvas.z) : coord;
+	}
+
+	float GLBackend::WindowToCanvasY(float y, bool clamped)
+	{
+		float coord = m_window_to_canvas_factors.z*y + m_window_to_canvas_factors.w;
+		return clamped?glm::clamp(coord, 0.0f, m_canvas.w) : coord;
 	}
 
 	void GLBackend::draw()
