@@ -107,6 +107,11 @@ namespace graphics
 		}
 	}
 
+	void stopMessageLoop()
+	{
+		engine->terminate();
+	}
+
 	void setCanvasSize(float w, float h)
 	{
 		engine->setCanvasSize(w, h);

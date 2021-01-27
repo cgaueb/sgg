@@ -84,6 +84,12 @@ bool FontLib::init()
 
 void FontLib::submitText(const TextRecord & text)
 {
+	if (m_curr_font == m_fonts.end())
+		return;
+	// Not a very elegant workaround, 
+	// but helps keep changes minimal, 
+	// without a performance impact:
+	const_cast<TextRecord&>(text).font = &(m_curr_font->second);
 	m_content.push_back(text);
 }
 
@@ -93,9 +99,10 @@ void FontLib::drawText(TextRecord entry)
 	float y = 0.0f;  
 	
 	const char *p;
-	if (m_curr_font == m_fonts.end())
+	
+	if (!entry.font)
 		return;
-	Font font = m_curr_font->second;
+	Font font = *(entry.font);
 	FT_GlyphSlot g = font.face->glyph;
 
 #ifndef __APPLE__

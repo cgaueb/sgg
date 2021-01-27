@@ -161,9 +161,17 @@ namespace graphics
 		m_audio->stopMusic(fade_time);
 	}
 
+	void GLBackend::terminate()
+	{
+		m_quit = true;
+	}
+
 
 	bool GLBackend::processEvent(SDL_Event event)
 	{
+		if (m_quit)
+			return false;
+
 		if (event.type == SDL_MOUSEMOTION)
 		{
 			m_prev_mouse_pos = m_mouse_pos;
@@ -575,6 +583,7 @@ namespace graphics
 		entry.use_gradient = brush.gradient;
 		entry.mv = m_transformation;
 		entry.proj = m_projection;
+		
 		m_fontlib.submitText(entry);
 	}
 
@@ -623,7 +632,7 @@ namespace graphics
 	{
 		SDL_Event event;
 		bool loop = true;
-		while (SDL_PollEvent(&event))
+		while (SDL_PollEvent(&event) && loop)
 		{
 			if (event.type == SDL_WINDOWEVENT_CLOSE || event.type == SDL_QUIT)
 			{
@@ -634,9 +643,9 @@ namespace graphics
 				loop = processEvent(event);
 			}
 		}
-			update();
-			m_idle_callback(getDeltaTime());
-			draw();
+		update();
+		m_idle_callback(getDeltaTime());
+		draw();
 		advanceTime();
 		SDL_Delay(5);
 

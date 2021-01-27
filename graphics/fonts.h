@@ -25,6 +25,7 @@ struct TextRecord
 	bool use_gradient;
 	glm::mat4 mv;
 	glm::mat4 proj;
+	Font * font;
 };
 
 

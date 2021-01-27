@@ -35,6 +35,7 @@ namespace graphics
 		FontLib		  m_fontlib;
 		SDL_TimerID   m_idle_timer;
 		glm::vec3	  m_back_color = { 0.0f, 0.0f, 0.0f };
+		bool		  m_quit = false;
 
 		glm::ivec2	  m_mouse_pos = glm::ivec2();
 		glm::ivec2	  m_prev_mouse_pos = glm::ivec2();
@@ -135,6 +136,8 @@ namespace graphics
 		void playSound(std::string soundfile, float volume, bool looping = false);
 		void playMusic(std::string soundfile, float volume, bool looping = true, int fade_time = 0);
 		void stopMusic(int fade_time = 0);
+
+		void terminate();
 	};
 
 }

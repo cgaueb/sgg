@@ -190,6 +190,11 @@ namespace graphics
 	*/
 	void startMessageLoop();
 
+	/** Terminates the message processing loop of the engine and returns control to the caller of startMessageLoop().
+	 *
+	 */
+	void stopMessageLoop();
+
 	/** Defines the extents of the drawing canvas in the custom units used by the application.
 
 	    The function explicitly sets the desired width and height of the drawing canvas in the measurement units
