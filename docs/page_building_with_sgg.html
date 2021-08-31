@@ -62,7 +62,7 @@ Setting up a Visual Studio project that uses SGG</h2>
 <p>3) It's time to properly setup the dependencies.</p>
 <p>3.1) In our <b>Solution Directory</b> (<code>Demo</code>), create two folders, <code>include</code> and <code>lib</code>.</p>
 <p><code>include</code> will hold the header files for SGG and <code>lib</code> the sgg library.</p>
-<p>3.2) From the <code>graphics</code> folder in the downloaded files, copy <code>graphics.h</code> and <code>scancodes.h</code> into the <code>include</code> folder of our Solution.</p>
+<p>3.2) From the <code>sgg</code> folder in the downloaded files, copy <code>graphics.h</code> and <code>scancodes.h</code> into the <code>include</code> folder of our Solution.</p>
 <p>3.3) Similarly, copy all the files from the <code>lib</code> folder that was created when we built the SGG library (<a class="el" href="page_building_sgg.html">Building SGG</a>) to the <code>lib</code> folder in our Solution directory.</p>
 <p>3.4) Right click on the project and select properties. First, we set the <code>Additional Include Directories</code>, under <code>C/C++ -&gt; General</code>, to have the <code>include</code> path from the solution. This can be done by setting <code>$<code></code>(SolutionDir)\include</code>.</p>
 <p>3.5) Then, for the libraries, under <code>Linker -&gt; General</code>, we set the <code>Additional Library Directories</code> to have the <code>lib</code> path from our solution. This can be done by setting <code>$<code></code>(SolutionDir)\lib</code>.</p>
@@ -80,9 +80,9 @@ Compiling an application that uses SGG from the command line</h2>
 <p>First, we <code>cd</code> to the directory of the SGG library. There, we create a directory named <code>bin</code> that will hold our executable:</p>
 <p><code>mkdir bin</code></p>
 <p>Then, we can build the <b>Release</b> version of the demo application with</p>
-<p><code>cl /EHsc /O2 /MD /Igraphics demo/demo.cpp /link /LIBPATH:lib /SUBSYSTEM:CONSOLE /MACHINE:X64 sgg.lib /OUT:bin/demo.exe</code></p>
+<p><code>cl /EHsc /O2 /MD /Isgg demo/demo.cpp /link /LIBPATH:lib /SUBSYSTEM:CONSOLE /MACHINE:X64 sgg.lib /OUT:bin/demo.exe</code></p>
 <p>and the <b>Debug</b> version of the demo application with</p>
-<p><code>cl /EHsc /Zi /MDd /DEBUG /D"_DEBUG" /Igraphics demo/demo.cpp /link /LIBPATH:lib /SUBSYSTEM:CONSOLE /MACHINE:X64 sggd.lib /OUT:bin/demod.exe</code></p>
+<p><code>cl /EHsc /Zi /MDd /DEBUG /D"_DEBUG" /Isgg demo/demo.cpp /link /LIBPATH:lib /SUBSYSTEM:CONSOLE /MACHINE:X64 sggd.lib /OUT:bin/demod.exe</code></p>
 <p>The demo requires a few assets(images, sounds, fonts e.t.c.) at runtime which can be founnd in <code>3rdparty</code>. Manually copy the <code>assets</code> folder to the <code>bin</code> directory so that our executable can find them when it runs.</p>
 <p>We also require the dynamically linked libraries for our 3rd party libraries. These can be found in <code>3rdparty\bin</code>. Copy <b>all the contents</b>(.dll files) of the <code>3rdparty\bin</code> folder to the <code>bin</code> directory we previously created. Our application will now be able to use them.</p>
 <p>Finally to run the program, change directory to <code>bin</code> with:</p>
@@ -98,9 +98,9 @@ Linux (GCC)</h1>
 <p>First, create a <code>bin</code> directory that will hold our executable:</p>
 <p><code>mkdir bin</code></p>
 <p>The command to compile the <code>demo</code> sample for <code>Release</code> should look like this:</p>
-<p><code>g++ -O2 -Llib -Igraphics demo/demo.cpp -lsgg -lGL -lGLEW -lSDL2 -lSDL2_mixer -lfreetype -o bin/demo</code></p>
+<p><code>g++ -O2 -Llib -Isgg demo/demo.cpp -lsgg -lGL -lGLEW -lSDL2 -lSDL2_mixer -lfreetype -o bin/demo</code></p>
 <p>and for <code>Debug</code></p>
-<p><code>g++ -Og -g -Llib -Igraphics demo/demo.cpp -lsggd -lGL -lGLEW -lSDL2 -lSDL2_mixer -lfreetype -o bin/demod</code></p>
+<p><code>g++ -Og -g -Llib -Isgg demo/demo.cpp -lsggd -lGL -lGLEW -lSDL2 -lSDL2_mixer -lfreetype -o bin/demod</code></p>
 <p>The demo requires a few assets(images, sounds, fonts e.t.c.) at runtime which can be found in <code>3rdparty</code>. Manually copy the <code>assets</code> folder to the <code>bin</code> directory so that our executable can find it when it runs.</p>
 <p>Finally to run the program, change directory to <code>bin</code> with:</p>
 <p><code>cd bin</code></p>
@@ -115,7 +115,7 @@ Linux (GCC)</h1>
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Aug 31 2021 13:06:49 for Simple Game Graphics Library by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.19
+Generated on Tue Aug 31 2021 13:28:21 for Simple Game Graphics Library by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.19
 </small></address>
 </body>
 </html>

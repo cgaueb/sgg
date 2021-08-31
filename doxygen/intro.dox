@@ -76,11 +76,13 @@ After cloning or unzipping, the directory structure should be as follows:
 `3rdparty/` Dependencies and assets\n
 `doc/` Documentation\n
 `demo/` Source for a sample application that depends on SGG\n
-`graphics/`Source for the SGG library itself. **!No need to modify**\n
+`sgg/` Source for the SGG library itself. **!No need to modify**\n
 `build_demo_x64.bat` Windows demo build script\n
 `build_demo_x64.sh` Linux demo build script\n
+`build_demo_macOS.sh` Mac OS demo build script\n
 `build_sgg_x64.bat` Windows SGG build script\n
-`build_sgg_x64.sh` Linux SGG build script
+`build_sgg_x64.sh` Linux SGG build script\n
+`build_sgg_macOS.sh` Mac OS SGG build script\n
 
 \section building_sgg_windows_msvc Windows (Visual Studio 2019 - MSVC)
 
@@ -211,7 +213,7 @@ Let's create a Visual Studio project with a sample project that uses SGG. Let's 
 
 `include` will hold the header files for SGG and `lib` the sgg library.
 
-3.2) From the `graphics` folder in the downloaded files, copy `graphics.h` and `scancodes.h` into the `include` folder of our Solution.
+3.2) From the `sgg` folder in the downloaded files, copy `graphics.h` and `scancodes.h` into the `include` folder of our Solution.
 
 3.3) Similarly, copy all the files from the `lib` folder that was created when we built the SGG library (\ref page_building_sgg) to the `lib` folder in our Solution directory.
 
@@ -245,11 +247,11 @@ First, we `cd` to the directory of the SGG library. There, we create a directory
 
 Then, we can build the **Release** version of the demo application with
 
-`cl /EHsc /O2 /MD /Igraphics demo/demo.cpp /link /LIBPATH:lib /SUBSYSTEM:CONSOLE /MACHINE:X64 sgg.lib /OUT:bin/demo.exe`
+`cl /EHsc /O2 /MD /Isgg demo/demo.cpp /link /LIBPATH:lib /SUBSYSTEM:CONSOLE /MACHINE:X64 sgg.lib /OUT:bin/demo.exe`
 
 and the **Debug** version of the demo application with
 
-`cl /EHsc /Zi /MDd /DEBUG /D"_DEBUG" /Igraphics demo/demo.cpp /link /LIBPATH:lib /SUBSYSTEM:CONSOLE /MACHINE:X64 sggd.lib /OUT:bin/demod.exe`
+`cl /EHsc /Zi /MDd /DEBUG /D"_DEBUG" /Isgg demo/demo.cpp /link /LIBPATH:lib /SUBSYSTEM:CONSOLE /MACHINE:X64 sggd.lib /OUT:bin/demod.exe`
 
 The demo requires a few assets(images, sounds, fonts e.t.c.) at runtime which can be founnd in `3rdparty`. Manually copy the `assets` folder to the `bin` directory so that our executable can find them when it runs. 
 
@@ -279,11 +281,11 @@ First, create a `bin` directory that will hold our executable:
 
 The command to compile the `demo` sample for `Release` should look like this:
 
-`g++ -O2 -Llib -Igraphics demo/demo.cpp -lsgg -lGL -lGLEW -lSDL2 -lSDL2_mixer -lfreetype -o bin/demo`
+`g++ -O2 -Llib -Isgg demo/demo.cpp -lsgg -lGL -lGLEW -lSDL2 -lSDL2_mixer -lfreetype -o bin/demo`
 
 and for `Debug`
 
-`g++ -Og -g -Llib -Igraphics demo/demo.cpp -lsggd -lGL -lGLEW -lSDL2 -lSDL2_mixer -lfreetype -o bin/demod`
+`g++ -Og -g -Llib -Isgg demo/demo.cpp -lsggd -lGL -lGLEW -lSDL2 -lSDL2_mixer -lfreetype -o bin/demod`
 
 The demo requires a few assets(images, sounds, fonts e.t.c.) at runtime which can be found in `3rdparty`. Manually copy the `assets` folder to the `bin` directory so that our executable can find it when it runs.
 
