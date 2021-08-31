@@ -122,6 +122,65 @@ These are the libraries we need to link to our program in order to use the funct
 
 4) To test the library, you can execute `./build_demo_x64.sh` to build the demo application found in `demo` and uses the SGG library. After a successful build, the executable can be found in `bin`. 
 
+\section building_sgg_cmake CMake (with Vcpkg)
+
+1) Follow the instructions at <a href=" https://github.com/microsoft/vcpkg"> https://github.com/microsoft/vcpkg</a> to install the `vcpkg` package manager at your desired location.
+
+2) Use Vcpkg to install the required dependencies with the following commands.
+
+```
+vcpkg install glew:x64-windows-static
+vcpkg install sdl2:x64-windows-static
+vcpkg install sdl2-mixer:x64-windows-static
+vcpkg install freetype:x64-windows-static
+vcpkg install glm:x64-windows-static
+```
+
+3) To continue, we have two options. In the following commands, replace the `/path/to/vcpkg/directory` placeholder with the proper path to your Vcpkg installation directory.
+
+### [Option 1 (Recommended)] Configuring project with vcpkg toolchain and registry support
+
+This will automatically register the library's build tree to cmake. It will also auto find it's dependencies through vcpkg's toolchain without requiring the dependent project to use the vcpkg toolchain itself. This is the most convenient option when building for personal usage. 
+
+```
+cmake -B build -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_EXPORT_PACKAGE_REGISTRY=ON \
+                -DCMAKE_TOOLCHAIN_FILE=/path/to/vcpkg/directory/scripts/buildsystems/vcpkg.cmake \
+                -DVCPKG_TARGET_TRIPLET=x64-windows-static
+```
+
+### [Option 2] Configuring project with vcpkg toolchain and no registry support
+
+This will force dependent projects to have a global or local installation of the package available. The installed folder is supposed to be packaged and distributed to different computers so it can't reuse the vcpkg config files as they may not be available. The dependent projects will have to either supply the vcpkg toolchain themselves or use any other way so as to make the library's dependencies discoverable. For example one may also use the conan package manager, cmake-supplied Find modules, system installed config files or local Find modules.
+
+```
+cmake -B build -DCMAKE_BUILD_TYPE=Release \
+               -DCMAKE_TOOLCHAIN_FILE=/path/to/vcpkg/directory/scripts/buildsystems/vcpkg.cmake \
+               -DVCPKG_TARGET_TRIPLET=x64-windows-static
+```
+
+4) To build, we execute the command 
+
+`cmake --build build`
+
+At this point, if configured using Option 1, the library will be available for consumption from other cmake projects.
+
+5) 
+For global installation use:
+
+`cmake --build build --target install`
+
+For installation to a destination folder, re-configure with CMake to set the `CMAKE_INSTALL_PREFIX`:
+
+```
+cmake -B build -DCMAKE_INSTALL_PREFIX=dest
+cmake --build build --target install
+```
+
+## Usage
+
+Dependent projects can use `find_package(sgg REQUIRED)` in their CMakeLists.txt and then link to the `sgg::sgg` target. 
+
 */
 
 /** \page page_building_with_sgg Building your Project with SGG
