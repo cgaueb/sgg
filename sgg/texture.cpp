@@ -77,7 +77,9 @@ GLuint graphics::TextureManager::getTexture(std::string file)
 	}
 	else
 	{
-		textures.insert(std::make_pair(file, Texture(file)));
+		std::pair<std::string, Texture> texinfo = std::make_pair(file, Texture(file));
+		textures.insert(texinfo);
+		return texinfo.second.getID();
 	}
-	return GLuint();
+	
 }

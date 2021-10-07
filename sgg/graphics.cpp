@@ -61,6 +61,11 @@ namespace graphics
 		engine->resetPose();
 	}
 
+	std::vector<std::string> preloadBitmaps(std::string dir)
+	{
+		return engine->preloadBitmaps(dir);
+	}
+
 	void playSound(std::string soundfile, float volume, bool looping)
 	{
 		engine->playSound(soundfile, volume, looping);
@@ -184,9 +189,11 @@ namespace graphics
 		ms.prev_pos_x = x;
 		ms.prev_pos_y = y;
 	}
+
 	bool getKeyState(scancode_t key)
 	{
 		return engine->getKeyState(key);
 	}
+
 }
 

@@ -2,6 +2,7 @@
 #include <string>
 #include <functional>
 #include <sgg/scancodes.h>
+#include <vector>
 
 /** \file graphics.h This is the *only* library header file that is required to be included by your application.
 	It contains the declaration of all SGG library functions and data structures.
@@ -690,8 +691,59 @@ namespace graphics
 	/** Restores both the orientation and scaling to their default values for subsequent draw calls.
 	*/
 	void resetPose();
+	
+	/** Loads all PNG bitmaps located in a directory specified by the argument dir at once. 
+	
+		Preloading image assets prior to actually requesting a draw call with a brush that
+		uses them can significantly boost performance during the typical draw call when a
+		bitmap is first used. 
+		
+		When a named image is used for a brush, the first time the
+		library encounters the image asset with the specific unique name, it attempts to
+		load the image, scale the bitmap to the closest power of two (if 
+		not already in the right resolution) and create the necessary internal representation
+		for the underlying graphics API. For large assets, this process can take some time,
+		noticeable as momentary freeze and general slowdown, depending on the size and number of
+		images needed to be loaded. This of course happens only the first time a bitmap is 
+		used in the application, but can nevertheless degrade the user experience. 
+
+		preloadBitmaps performs the above process in bulk, for all PNG bitmaps found in the 
+		provided directory. This can be done during the application initialization stage,
+		before the actual main interaction loop begins. The function can be called multiple 
+		times for a different directory each time, to progressively load organized collections 
+		of bitmaps. preloadBitmaps returns a vector of the bitmaps successfully loaded, which
+		can be used as a means to validate that all assets have been properly loaded. Another useful
+		application of the function is to load multiple bitmaps without the need to know the 
+		specific names beforehand. For example, one can organize the frames of an animation sequence 
+		into a separate folder and load all the sequence at once, maintaining the animation bitmap 
+		names for reference and cycling over the animation sequence. Another different application
+		example is the call of the function on a directory to discover and load all images contained 
+		there to be able to list and preview the images during runtime (e.g. in an image viewer 
+		application). 
+
+		The preloadBitmaps function can be called at any time after the graphics initialization, i.e.
+		after the call to createWindow.
+
+		Please note that since a bitmap is identified by its fully qualified path, bitmaps with the same
+		filename residing in different directories are treated as two different assets. Also note that
+		multiple attempts to preload the same bitmap will report the bitmap as successfully loaded in the 
+		return vector, but the actual bitmap loaded the first time will be used and will not be replaced
+		by the loader in subsequent calls. This means that during runtime, even if one modifies the 
+		bitmap asset externally and explicitly calls preloadBitmaps (or any other bitmap loading via a 
+		new brush creation), the original bitmap loaded the first time will be used.
+
+		\param dir is the directory of the bitmaps to preload. Only PNG images will be loaded (extension is 
+		case-insensitive) and all other files in the directory will be ignored. The function is not
+		called recursively for contained sub-directories. 
+
+		\return a vector of the full path names to the individual bitmaps identified and successfully loaded. The 
+		path names will include the directory name given.
+	*/
+	std::vector<std::string> preloadBitmaps(std::string dir);
+
 	/** @}*/
 
+	   
 	/** \defgroup _AUDIO Audio output
 	* @{
 	*/

@@ -1,0 +1,2 @@
+- Multiple font support per single frame draw (see TextRecord)
+- Window to canvas unit conversion functions

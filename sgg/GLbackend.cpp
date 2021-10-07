@@ -9,6 +9,17 @@
 #include <glm/gtx/transform.hpp>
 #include <sgg/commonshaders.h>
 #include <sgg/graphics.h>
+#include <filesystem>
+#include <cctype>
+
+#ifdef  _EXPERIMENTAL_FILESYSTEM_
+namespace fs = std::experimental::filesystem;
+#else
+namespace fs = std::filesystem;
+#endif
+
+
+
 
 #ifdef __APPLE__
 #define sggBindVertexArray glBindVertexArrayAPPLE
@@ -459,6 +470,33 @@ namespace graphics
 		glEnableVertexAttribArray(attrib_flat_position);
 		glVertexAttribPointer(attrib_flat_position, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glDrawArrays(GL_LINES, 0, 2);
+	}
+
+	std::vector<std::string> GLBackend::preloadBitmaps(std::string dir)
+	{
+		std::vector<std::string> names;
+		Brush brush;
+		fs::directory_iterator dir_iter;
+		for (auto& entry : fs::directory_iterator(dir))
+		{
+			std::string filename = entry.path().string();
+			std::cout << filename ;
+			// TODO: for now, using MSVC17-compliant code, where
+			// filesystem classes are not fully implemented.
+			std::string extension = filename.substr(filename.length() - 4, 4);
+			std::transform(extension.begin(), extension.end(), extension.begin(),
+				[](unsigned char c) { return std::tolower(c); });
+			if (extension.compare(".png"))
+			{
+				continue;
+			}
+			
+			if (textures.getTexture(filename))
+			{
+				names.push_back(filename);
+			}
+		}
+		return names;
 	}
 
 	void GLBackend::drawSector(float cx, float cy, float start_angle, float end_angle, float radius1, float radius2, const Brush & brush)

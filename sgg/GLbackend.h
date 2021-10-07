@@ -11,6 +11,7 @@
 #include <sgg/scancodes.h>
 #include <sgg/texture.h>
 #include <sgg/AudioManager.h>
+#include <algorithm>
 
 #define SGG_CHECK_GL() do {GLenum err;while((err = glGetError()) != GL_NO_ERROR){ printf("Error %s %d\n", (const char*)glewGetErrorString(err), err);exit(0);}printf("Pass\n");} while(0);
 
@@ -102,6 +103,7 @@ namespace graphics
 		void setOrientation(float degrees);
 		void resetPose();
 		bool setFont(std::string fontname);
+		std::vector<std::string> preloadBitmaps(std::string dir);
 
 		bool getKeyState(scancode_t key);
 		void setDrawCallback(std::function<void()> drf);
