@@ -480,7 +480,7 @@ namespace graphics
 		for (auto& entry : fs::directory_iterator(dir))
 		{
 			std::string filename = entry.path().string();
-			std::cout << filename ;
+			// std::cout << filename ;
 			// TODO: for now, using MSVC17-compliant code, where
 			// filesystem classes are not fully implemented.
 			std::string extension = filename.substr(filename.length() - 4, 4);
