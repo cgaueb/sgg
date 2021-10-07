@@ -6,8 +6,8 @@ AR=ar
 BUILD_PATH="build/Release"
 BUILD_PATH_DEBUG="build/Debug"
 LIB_PATH="lib"
-CFLAGS="-O2"
-CFLAGS_DEBUG="-Og -g"
+CFLAGS="-O2 -std=c++17"
+CFLAGS_DEBUG="-Og -g -std=c++17"
 
 mkdir -p build
 mkdir -p $LIB_PATH
