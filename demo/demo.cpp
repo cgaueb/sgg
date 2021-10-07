@@ -157,6 +157,11 @@ int main()
 	
 	game.init();
 
+	const auto assests = graphics::preloadBitmaps("assets");
+	for (const auto asset : assests) {
+		std::cout << "PRELOADING : " << asset << std::endl;
+	}
+
 	graphics::setUserData(&game);
 	graphics::setDrawFunction(draw);
 	graphics::setUpdateFunction(update);
