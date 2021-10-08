@@ -8,9 +8,6 @@ set STUDIO_PATH=C:\Program Files (x86)\Microsoft Visual Studio
 IF EXIST "%STUDIO_PATH%\2017\" (
 set STUDIO_VERSION=2017
 )
-IF EXIST "%STUDIO_PATH%\2019\" (
-set STUDIO_VERSION=2019
-)
 IF EXIST "%STUDIO_PATH%\%STUDIO_VERSION%\Enterprise" (
 set STUDIO_EDITION=Enterprise
 )
@@ -46,8 +43,8 @@ set EXE_NAME_DEBUG=demod.exe
 set LIB_PATH=lib
 set SRC_PATH=demo
 set COMPILER_OPTIONS=/EHsc /nologo
-set DEBUG_MODE=/Zi /DEBUG /D"_DEBUG" /MDd
-set RELEASE_MODE=/O2 /MD
+set DEBUG_MODE=/Zi /DEBUG /D"_DEBUG" /MDd /std:c++17
+set RELEASE_MODE=/O2 /MD /std:c++17
 set LIB_OPTIONS=/LIBPATH:"%LIB_PATH%" /SUBSYSTEM:CONSOLE /MACHINE:X64 /nologo
 
 echo Creating directories
