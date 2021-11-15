@@ -8,6 +8,9 @@ set STUDIO_PATH=C:\Program Files (x86)\Microsoft Visual Studio
 IF EXIST "%STUDIO_PATH%\2017\" (
 set STUDIO_VERSION=2017
 )
+IF EXIST "%STUDIO_PATH%\2019\" (
+set STUDIO_VERSION=2019
+)
 IF EXIST "%STUDIO_PATH%\%STUDIO_VERSION%\Enterprise" (
 set STUDIO_EDITION=Enterprise
 )
