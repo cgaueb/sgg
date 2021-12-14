@@ -682,7 +682,8 @@ namespace graphics
 			}
 		}
 		update();
-		m_idle_callback(getDeltaTime());
+		if (m_idle_callback != nullptr)
+			m_idle_callback(getDeltaTime());
 		draw();
 		advanceTime();
 		SDL_Delay(5);
