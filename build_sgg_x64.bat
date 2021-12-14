@@ -1,10 +1,31 @@
-@SETLOCAL
+@SETLOCAL enabledelayedexpansion
 @echo off
 
 set STUDIO_VERSION=None
 set STUDIO_EDITION=None
-set STUDIO_PATH=C:\Program Files (x86)\Microsoft Visual Studio
+set STUDIO_PATH=\Program Files (x86)\Microsoft Visual Studio
+set DRIVE_LIST=(C D E F G H I J K L M N O P Q R S T U V W X Y Z A B)
 
+
+FOR %%i IN %DRIVE_LIST% DO (
+	IF NOT EXIST "!STUDIO_PATH!\2017" (
+		IF NOT EXIST "!STUDIO_PATH!\2019" (
+			set "STUDIO_PATH=%%i:\Program Files (x86)\Microsoft Visual Studio"	
+		)
+		IF EXIST "!STUDIO_PATH!\2019" (
+			goto :found
+		) 
+	)
+	IF EXIST "!STUDIO_PATH!\2017" (
+		goto :found
+	)
+)
+
+echo "No Visual Studio installation was found. Please make sure that Visual Studio is installed on your system."
+echo "If Visual Studio is installed but in non-regular directory, please enter the path manually (STUDIO_PATH) by editing this file in a text editor."
+EXIT \B
+
+:found
 IF EXIST "%STUDIO_PATH%\2017\" (
 set STUDIO_VERSION=2017
 )
