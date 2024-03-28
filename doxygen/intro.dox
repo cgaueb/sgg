@@ -303,6 +303,10 @@ or
 
 There is also a script named `build_demo_x64.sh` that automatically executes the above steps for convenience. For your project, feel free to use or customize this build script according to your needs.
 
+If you plan on using this build script in your project, and you start having to
+compile multiple source files, it is **strongly recommended** to consider using a
+Makefile or CMake (Makefiles are a lot simpler). See: \ref page_example_makefile .
+
 The library is very simple to use. The first thing to do is to include the graphics.h header file into your
 code (see supplementary example code):
 \code{.cpp}
@@ -314,6 +318,121 @@ names or add:
 \code{.cpp}
 using namespace graphics
 \endcode
+
+\page page_example_makefile Example Makefile
+
+Makefiles are superior to build scripts because:
+1. they speed up compilation (especially for C/C++), and
+2. they are simple to configure
+
+## The idea
+
+If set up properly, Makefiles can detect dependencies between source files.
+This is perfect for C/C++ projects, since usually we don't need to recompile
+each source file after a small change to one of them. We can simply compile
+each `*.cpp` file into it's respective object file (`*.o`) and then link them
+all together.
+
+An extensive but *very* useful guide on Makefiles can be found <a href="https://makefiletutorial.com">here</a>.
+
+## Example
+Suppose we have build sgg (see: \ref page_building_sgg) and played around with
+our project a bit. Our directory structure looks like this:
+
+	my_project/
+	├── include/
+	│   └── sgg/
+	│       ├── graphics.h
+	│       └── scancodes.h
+	├── lib/
+	│   ├── libsgg.a
+	│   └── libsggd.a
+	├── level.cpp
+	├── level.h
+	├── main.cpp
+	├── player.cpp
+	├── player.h
+	├── timer.cpp
+	└── timer.h
+
+Now we can add a `Makefile` in this directory to automate compilation.
+
+\code
+# simple game graphics library
+SGGINC = ./include
+SGGLIB = ./lib
+
+# includes and libs
+INCS = -I$(SGGINC)
+LIBS = -lsgg -lGL -lGLEW -lSDL2 -lSDL2_mixer -lfreetype
+LIBS_D = -lsggd -lGL -lGLEW -lSDL2 -lSDL2_mixer -lfreetype
+
+# separate object files for debug version (they compile with different flags)
+SRC = main.cpp level.cpp player.cpp
+OBJ = $(SRC:.cpp=.o)
+OBJ_D = $(SRC:.cpp=.debug.o)
+
+CXX = g++
+CXXFLAGS = -O2 $(INCS)
+CXXFLAGS_D = -Og -g $(INCS)
+LDFLAGS = -L$(SGGLIB) $(LIBS)
+LDFLAGS_D = -L$(SGGLIB) $(LIBS_D)
+TARGET = project
+TARGET_D = project_d
+
+# only build the debug version by default (same as in Visual Studio)
+all: debug
+
+debug: options_d $(TARGET_D)
+
+options_d:
+	@echo "[DEBUG] Project build options:"
+	@echo "CXXFLAGS = $(CXXFLAGS_D)"
+	@echo "LDFLAGS = $(LDFLAGS_D)"
+	@echo "CXX = $(CXX)"
+
+$(TARGET_D): $(OBJ_D)
+	$(CXX) $(CXXFLAGS_D) $(OBJ_D) -o $@ $(LDFLAGS_D)
+
+%.debug.o: %.cpp %.h
+	$(CXX) $(CXXFLAGS_D) -c $< -o $@ $(LDFLAGS_D)
+
+main.debug.o: main.cpp
+	$(CXX) $(CXXFLAGS_D) -c $< -o $@ $(LDFLAGS_D)
+
+release: options $(TARGET)
+
+options:
+	@echo "[RELEASE] Project build options:"
+	@echo "CXXFLAGS = $(CXXFLAGS)"
+	@echo "LDFLAGS = $(LDFLAGS)"
+	@echo "CXX = $(CXX)"
+
+$(TARGET): $(OBJ)
+	$(CXX) $(CXXFLAGS) $(OBJ) -o $@ $(LDFLAGS)
+
+%.o: %.cpp %.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LDFLAGS)
+
+main.o: main.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LDFLAGS)
+
+both: options_d options debug release
+
+clean:
+	rm -f $(TARGET) $(TARGET_D) $(OBJ) $(OBJ_D)
+
+.PHONY: all debug options_d release options both clean
+\endcode
+
+## Usage
+
+
+	$ make release   # builds the release version, the executable is called 'project'
+	$ make debug     # builds the debug version, the executable is called 'project_d'
+	$ make           # also builds the debug version, since it is the default target
+	$ make both      # builds both versions
+	$ make clean     # clean project directory of object files and targets
 
 \page page_simple_app A Simple Example
 
