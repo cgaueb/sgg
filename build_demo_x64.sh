@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -xe
+
 CC=g++
 LD=g++
 BUILD_PATH="build/Release"
