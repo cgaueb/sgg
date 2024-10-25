@@ -535,6 +535,15 @@ namespace graphics
 	/** \defgroup _GRAPHICS Graphics output
 	* @{
 	*/
+	 
+	/** Draws a Triangle.
+
+	        3 independed Vectors from the the applications cartesian plane, enabling advanced 3D graphics capabilities.
+		Brush for color duh.
+	*/
+
+	void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, const Brush & brush);
+
 
 	/** Draws a rectangle.
 
