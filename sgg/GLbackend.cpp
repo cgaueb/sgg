@@ -380,6 +380,83 @@ namespace graphics
 		m_transformation = glm::rotate(-3.1415936f*m_orientation / 180.0f, glm::vec3(0.f, 0.f, 1.f)) * glm::scale(m_scale);
 	}
 
+        void GLBackend::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, const Brush & brush)
+	{
+		glEnable(GL_TEXTURE_2D);
+		glFrontFace(GL_CCW);
+		glPolygonMode(GL_FRONT, GL_FILL);
+		glm::mat4 mat = glm::mat4(1.0f);
+		m_flat_shader["gradient"] = glm::vec2(brush.gradient_dir_u, brush.gradient_dir_v);
+
+		GLfloat triangle[3][4] = {
+		{ x1, y1, 0.0f, 1.0f },   // First point
+		{ x2, y2, 0.0f, 1.0f },   // Second point
+		{ x3, y3, 0.0f, 1.0f }    // Third point
+		};
+
+		// fill
+		if (brush.fill_opacity != 0.0f || brush.fill_secondary_opacity != 0.0f)
+		{
+			int tid = textures.getTexture(brush.texture);
+			if (tid > 0)
+			{
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, tid);
+
+			}
+
+			m_flat_shader["color1"] = glm::vec4(brush.fill_color[0], brush.fill_color[1], brush.fill_color[2], brush.fill_opacity);
+
+			if (brush.gradient)
+			{
+				m_flat_shader["color2"] = glm::vec4(brush.fill_secondary_color[0], brush.fill_secondary_color[1],
+					brush.fill_secondary_color[2], brush.fill_secondary_opacity);
+			}
+			else
+			{
+				m_flat_shader["color2"] = glm::vec4(brush.fill_color[0], brush.fill_color[1], brush.fill_color[2], brush.fill_opacity);
+			}
+
+			m_flat_shader["MV"] = mat;
+			m_flat_shader["tex"] = 0;
+			if (tid > 0)
+				m_flat_shader["has_texture"] = 1;
+			else
+				m_flat_shader["has_texture"] = 0;
+
+			unsigned int attrib_flat_position = m_flat_shader.getAttributeLocation("coord");
+			sggBindVertexArray(m_triangle_vao);
+			glBindBuffer(GL_ARRAY_BUFFER, m_triangle_vbo);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_DYNAMIC_DRAW);
+			glEnableVertexAttribArray(attrib_flat_position);
+			glVertexAttribPointer(attrib_flat_position, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
+
+		}
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		if (brush.outline_opacity > 0.0f)
+		{
+			m_flat_shader.use();
+			m_flat_shader["color1"] = glm::vec4(brush.outline_color[0], brush.outline_color[1], brush.outline_color[2], brush.outline_opacity);
+			m_flat_shader["color2"] = glm::vec4(brush.outline_color[0], brush.outline_color[1], brush.outline_color[2], brush.outline_opacity);
+			m_flat_shader["MV"] = mat;
+			m_flat_shader["has_texture"] = 0;
+			glLineWidth(brush.outline_width);
+			sggBindVertexArray(m_triangle_outline_vao);
+			glBindBuffer(GL_ARRAY_BUFFER, m_triangle_outline_vbo);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_DYNAMIC_DRAW);
+			unsigned int attrib_flat_position = m_flat_shader.getAttributeLocation("coord");
+			glEnableVertexAttribArray(attrib_flat_position);
+			glVertexAttribPointer(attrib_flat_position, 4, GL_FLOAT, GL_FALSE, 0, 0);
+			glDrawArrays(GL_LINE_LOOP, 0, 3);
+			glLineWidth(1);
+
+		}
+	}
+         
 	void GLBackend::drawRect(float cx, float cy, float w, float h, const Brush & brush)
 	{
 
