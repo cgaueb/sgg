@@ -4,7 +4,7 @@ This library (SGG) aims to provide a simple interface for students to include ba
 - Original Repo can be found [here](https://github.com/cgaueb/sgg)
 - Documentation can be found [here](https://cgaueb.github.io/sgg/index.html "SGG's Documentation")
 
-## Installation
+## Installation (Windows x64 Exclusively)
 
 - You need the MVSC compiler, trying to compile with MinGW via CMake won't work, it won't recognise C++ libraries even with vcpkg config.
 - Run _build_sgg_x64.bat_ and wait for the compiler to finish.
