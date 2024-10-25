@@ -6,10 +6,9 @@ This library (SGG) aims to provide a simple interface for students to include ba
 
 ## Installation
 
-- You need MVSC to compile.
+- You need the MVSC compiler, trying to compile with MinGW via CMake won't work, it won't recognise C++ libraries even with vcpkg config.
 - Run _build_sgg_x64.bat_ and wait for the compiler to finish.
 -  - When you compile the SGG your library should be under ./lib/. You need sgg.lib and  sggd.lib.
-- Also you need the MVSC compiler, trying to compile with MinGW will result in errors.
 
 ```bat
 Dunno i just use CLion and you should too. Fuck Visual Studio...
