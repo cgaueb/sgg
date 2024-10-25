@@ -6,7 +6,7 @@ This library (SGG) aims to provide a simple interface for students to include ba
 
 ## Installation
 
-- You need MVSC to compile build.
+- You need MVSC to compile.
 - Run _build_sgg_x64.bat_ and wait for the compiler to finish.
 -  - When you compile the SGG your library should be under ./lib/. You need sgg.lib and  sggd.lib.
 - Also you need the MVSC compiler, trying to compile with MinGW will result in errors.
