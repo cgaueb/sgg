@@ -55,6 +55,10 @@ namespace graphics
 		glm::vec3	  m_scale = glm::vec3(1.0f);
 		Shader		  m_flat_shader;
 		
+                GLuint		m_triangle_vbo;
+		GLuint		m_triangle_vao;
+		GLuint		m_triangle_outline_vbo;
+		GLuint		m_triangle_outline_vao;
 		GLuint		m_rect_vbo;
 		GLuint		m_rect_vao;
 		GLuint		m_rect_outline_vbo;
@@ -91,6 +95,7 @@ namespace graphics
 		std::function<void(int w, int h)> m_resize_callback = nullptr;
 
 	public:
+                void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, const struct Brush & brush);
 		void drawRect(float cx, float cy, float w, float h, const struct Brush & brush);
 		void drawLine(float x_1, float y_1, float x_2, float y_2, const struct Brush & brush);
 		void drawSector(float cx, float cy, float start_angle, float end_angle, float radius1, float radius2, const struct Brush & brush);
