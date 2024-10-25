@@ -10,10 +10,6 @@ This library (SGG) aims to provide a simple interface for students to include ba
 - Run _build_sgg_x64.bat_ and wait for the compiler to finish.
 -  - When you compile the SGG your library should be under ./lib/. You need sgg.lib and  sggd.lib.
 
-```bat
-Dunno i just use CLion and you should too. Fuck Visual Studio...
-```
-
 ## Contributors
  31/08/2021 - [Liarokapis Alexandros](https://github.com/liarokapisv "Liarokapis Alexandros") (CMake build scripts and instructions)
  
