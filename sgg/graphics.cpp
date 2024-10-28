@@ -16,6 +16,11 @@ namespace graphics
 		return engine->getGlobalTime();
 	}
 
+	bool setWindowName(const char* title)
+	{
+		return engine->setWindowName(title);
+	}
+
 	void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, const Brush & brush)
 	{
 		engine->drawTriangle(x1, y1, x2, y2, x3, y3, brush);
@@ -104,6 +109,11 @@ namespace graphics
 		engine->cleanup();
 		delete engine;
 		engine = nullptr;
+	}
+
+	float getFPS() 
+	{
+		return engine->getFPS();
 	}
 
 	void startMessageLoop()
