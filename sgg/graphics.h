@@ -259,6 +259,9 @@ namespace graphics
 
 		\see windowToCanvasY
 	*/
+
+	float getFPS();
+
 	float windowToCanvasX(float x, bool clamped = true);
 
 	/** Converts the vertical window coordinate of a point to the corresponding canvas coordinate.
@@ -535,10 +538,12 @@ namespace graphics
 	/** \defgroup _GRAPHICS Graphics output
 	* @{
 	*/
-	 
+
+	bool setWindowName(const char* title);
+
 	/** Draws a Triangle.
 
-	        3 independed Vectors from the the applications cartesian plane, enabling advanced 3D graphics capabilities.
+		Based on 3 independed vertices.
 		Brush for color duh.
 	*/
 
