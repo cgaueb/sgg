@@ -1,5 +1,4 @@
 #include <cstring>
-
 #include <sgg/GLbackend.h>
 #include <iostream>
 #include <string>
@@ -142,6 +141,7 @@ namespace graphics
 		m_requested_canvas.z = w;
 		m_requested_canvas.w = h;
 	}
+
 
 	void GLBackend::setFullscreen(bool fs)
 	{
@@ -380,7 +380,7 @@ namespace graphics
 		m_transformation = glm::rotate(-3.1415936f*m_orientation / 180.0f, glm::vec3(0.f, 0.f, 1.f)) * glm::scale(m_scale);
 	}
 
-        void GLBackend::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, const Brush & brush)
+	void GLBackend::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, const Brush & brush)
 	{
 		glEnable(GL_TEXTURE_2D);
 		glFrontFace(GL_CCW);
@@ -456,10 +456,10 @@ namespace graphics
 
 		}
 	}
-         
+
+
 	void GLBackend::drawRect(float cx, float cy, float w, float h, const Brush & brush)
 	{
-
 		glEnable(GL_TEXTURE_2D);
 		glFrontFace(GL_CCW);
 		glPolygonMode(GL_FRONT, GL_FILL);
@@ -529,25 +529,46 @@ namespace graphics
 		
 	}
 
-	void GLBackend::drawLine(float x_1, float y_1, float x_2, float y_2, const Brush & brush)
-	{
+	void GLBackend::drawLine(float x_1, float y_1, float x_2, float y_2, const Brush& brush) {
+		// Set the color for the line using the brush's outline color and opacity
 		m_flat_shader["color1"] = glm::vec4(brush.outline_color[0], brush.outline_color[1], brush.outline_color[2], brush.outline_opacity);
+
+		// Apply an identity matrix (no transformations applied, just a simple 1:1 mapping)
 		m_flat_shader["MV"] = glm::mat4(1.0f);
+
+		// Set the gradient direction to use in the shader (not affecting much here since it's just a line)
 		m_flat_shader["gradient"] = glm::vec2(1.0f, 0.0f);
-		GLfloat line[2][4] = 
-		{
-			{ x_1, y_1, 0.0f, 1.0f},
-			{ x_2, y_2, 0.1f, 1.0f},
+
+		// Define the two points of the line with their respective coordinates
+		// Each vertex has 4 components: x, y, z (depth), and w (for homogeneous coordinates)
+		GLfloat line[2][4] = {
+			{ x_1, y_1, 0.0f, 1.0f },  // First point (x_1, y_1)
+			{ x_2, y_2, 0.1f, 1.0f }   // Second point (x_2, y_2), with a slight difference in z for depth
 		};
 
+		// Bind the Vertex Array Object (VAO) which stores the configuration for the line's vertex attributes
 		sggBindVertexArray(m_line_vao);
+
+		// Bind the Vertex Buffer Object (VBO) to store the line vertex data in GPU memory
 		glBindBuffer(GL_ARRAY_BUFFER, m_line_vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof line, line, GL_DYNAMIC_DRAW);
+
+		// Upload the line vertex data to the GPU, marking it as dynamic (GL_DYNAMIC_DRAW) for potentially frequent updates
+		glBufferData(GL_ARRAY_BUFFER, sizeof(line), line, GL_DYNAMIC_DRAW);
+
+		// Get the shader attribute location for the vertex position ("coord") from the shader program
 		unsigned int attrib_flat_position = m_flat_shader.getAttributeLocation("coord");
+
+		// Enable the vertex attribute array for position to allow the shader to use the coordinates data
 		glEnableVertexAttribArray(attrib_flat_position);
+
+		// Specify how the position data is organized in the buffer:
+		// 4 components per vertex (x, y, z, w), each of type float, with no padding between them
 		glVertexAttribPointer(attrib_flat_position, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+		// Draw the line using the vertex data, as a line connecting the two points
 		glDrawArrays(GL_LINES, 0, 2);
 	}
+
 
 	std::vector<std::string> GLBackend::preloadBitmaps(std::string dir)
 	{
@@ -759,13 +780,31 @@ namespace graphics
 			}
 		}
 		update();
-		if (m_idle_callback != nullptr)
+		if (m_idle_callback != nullptr) {
 			m_idle_callback(getDeltaTime());
+		}
 		draw();
+		calculateFPS();
 		advanceTime();
 		SDL_Delay(5);
 
 		return loop;
+	}
+
+	float GLBackend::getFPS() {
+		return m_fps;
+	}
+
+	void GLBackend::calculateFPS() {
+		m_frame_count++;
+		m_time_accumulator += m_delta_time;
+
+		// Update FPS every second
+		if (m_time_accumulator >= m_fps_update_interval) {
+			m_fps = m_frame_count * (1000.0f / m_time_accumulator); // FPS calculation
+			m_frame_count = 0;
+			m_time_accumulator = 0.0f;
+		}
 	}
 
 	void GLBackend::update(float delta_time)
@@ -925,6 +964,17 @@ namespace graphics
 	{
 		m_resize_callback = rsf;
 	}
+
+	bool GLBackend::setWindowName(const char* title)
+	{
+		if (!m_window || !title) {
+			return false;  // Return false if the window or title is invalid
+		}
+			m_title = title;
+			SDL_SetWindowTitle(m_window, title);  // Set the window title
+			return true;
+	}
+
 
 	bool GLBackend::init()
 	{
