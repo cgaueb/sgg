@@ -55,7 +55,7 @@ namespace graphics
 		glm::vec3	  m_scale = glm::vec3(1.0f);
 		Shader		  m_flat_shader;
 		
-                GLuint		m_triangle_vbo;
+		GLuint		m_triangle_vbo;
 		GLuint		m_triangle_vao;
 		GLuint		m_triangle_outline_vbo;
 		GLuint		m_triangle_outline_vao;
@@ -94,8 +94,16 @@ namespace graphics
 		std::function<void(float ms)> m_idle_callback = nullptr;
 		std::function<void(int w, int h)> m_resize_callback = nullptr;
 
+		float m_fps = 0.0f;
+		int m_frame_count = 0;
+		float m_fps_update_interval = 1000.0f; // Update FPS every second (1000ms)
+		float m_time_accumulator = 0.0f;
+
 	public:
-                void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, const struct Brush & brush);
+		void calculateFPS();
+		float getFPS();
+		bool setWindowName(const char* title);
+		void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, const struct Brush & brush);
 		void drawRect(float cx, float cy, float w, float h, const struct Brush & brush);
 		void drawLine(float x_1, float y_1, float x_2, float y_2, const struct Brush & brush);
 		void drawSector(float cx, float cy, float start_angle, float end_angle, float radius1, float radius2, const struct Brush & brush);
