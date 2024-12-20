@@ -1,12 +1,10 @@
-<<<<<<< Updated upstream
-
-#include <sgg/fonts.h>
-=======
 #include "headers/Fonts.h"
->>>>>>> Stashed changes
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+
+#include "headers/Texture.h"
+#include "headers/TextureManager.h"
 
 #ifdef __APPLE__
 #define sggBindVertexArray glBindVertexArrayAPPLE
@@ -16,7 +14,7 @@
 #define sggGenVertexArrays glGenVertexArrays
 #endif
 
-const char* __FontVertexShader = R"(
+const char *__FontVertexShader = R"(
 #version 120
 
 attribute vec4 coord;
@@ -30,7 +28,7 @@ void main(void) {
 }
 )";
 
-const char* __FontFragmentShader = R"(
+const char *__FontFragmentShader = R"(
 #version 120
 
 varying vec2 texcoord;
@@ -45,179 +43,161 @@ void main(void) {
 }
 )";
 
+bool FontLib::init() {
+    if (FT_Init_FreeType(&m_ft)) {
+        return false;
+    }
 
+    m_font_shader = Shader(__FontVertexShader, __FontFragmentShader);
 
-bool FontLib::init()
-{
-	if (FT_Init_FreeType(&m_ft))
-	{
-		return false;
-	}
-	
-	glGetError();
-	const GLubyte * s = glewGetErrorString(glGetError());
+    unsigned int attrib_position = m_font_shader.getAttributeLocation("coord");
 
-	m_font_shader = Shader(__FontVertexShader, __FontFragmentShader);
-		
+    sggGenVertexArrays(1, &m_font_vao);
+    sggBindVertexArray(m_font_vao);
 
-	if (!m_font_shader.init())
-		return false;
-	
-	unsigned int attrib_position = m_font_shader.getAttributeLocation("coord");
-		
-	sggGenVertexArrays(1, &m_font_vao);
-	sggBindVertexArray(m_font_vao);
-		
-	glGenBuffers(1, &m_font_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, m_font_vbo);
-	glEnableVertexAttribArray(attrib_position); 
-	glVertexAttribPointer(attrib_position, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    glGenBuffers(1, &m_font_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_font_vbo);
+    glEnableVertexAttribArray(attrib_position);
+    glVertexAttribPointer(attrib_position, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
-	GLfloat box[4][4] = {
-		{ -1, 1    , 0, 0 },
-		{ 1, 1    , 1, 0 },
-		{ -1, -1, 0, 1 },
-		{ 1, -1, 1, 1 },
-	};
-	glBufferData(GL_ARRAY_BUFFER, sizeof box, box, GL_DYNAMIC_DRAW);
+    GLfloat box[4][4] = {
+        {-1, 1, 0, 0},
+        {1, 1, 1, 0},
+        {-1, -1, 0, 1},
+        {1, -1, 1, 1},
+    };
+    glBufferData(GL_ARRAY_BUFFER, sizeof box, box, GL_DYNAMIC_DRAW);
 
-	m_curr_font = m_fonts.end();
+    m_curr_font = m_fonts.end();
 
-	return true;
+    return true;
 }
 
-void FontLib::submitText(const TextRecord & text)
-{
-	if (m_curr_font == m_fonts.end())
-		return;
-	// Not a very elegant workaround, 
-	// but helps keep changes minimal, 
-	// without a performance impact:
-	const_cast<TextRecord&>(text).font = &(m_curr_font->second);
-	m_content.push_back(text);
+void FontLib::submitText(const TextRecord &text) {
+    if (m_curr_font == m_fonts.end())
+        return;
+    // Not a very elegant workaround,
+    // but helps keep changes minimal,
+    // without a performance impact:
+    const_cast<TextRecord &>(text).font = &(m_curr_font->second);
+    m_content.push_back(text);
 }
 
-void FontLib::drawText(TextRecord entry)
-{
-	float x = 0.0f;  
-	float y = 0.0f;  
-	
-	const char *p;
-	
-	if (!entry.font)
-		return;
-	Font font = *(entry.font);
-	FT_GlyphSlot g = font.face->glyph;
+void FontLib::drawText(TextRecord entry) {
+    float x = 0.0f;
+    float y = 0.0f;
+
+    const char *p;
+
+    if (!entry.font)
+        return;
+    Font font = *(entry.font);
+    FT_GlyphSlot g = font.face->glyph;
 
 #ifndef __APPLE__
-	//glFrontFace(GL_CW);
+    //glFrontFace(GL_CW);
 #endif
-	
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, font.font_tex);
-	static int c = 0;
 
-	m_font_shader.use();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    auto &textureManager = graphics::TextureManager::getInstance();
+    graphics::Texture *fontTexture = textureManager.getTexture(font.font_tex);
+    textureManager.bindTexture(fontTexture);
 
-	m_font_shader["tex"] = 0;
-	
-	m_font_shader["color1"] = entry.color1;
-	m_font_shader["color2"] = (entry.use_gradient? entry.color2 : entry.color1);
-	m_font_shader["gradient"] = entry.gradient;
-	m_font_shader["projection"] = entry.proj;
-	   
-	for (p = entry.text.c_str(); *p; p++) {
-		if (FT_Load_Char(font.face, *p, FT_LOAD_RENDER))
-			continue;
-		
-		
-		glTexImage2D(
-			GL_TEXTURE_2D,
-			0,
-			GL_RED,
-			g->bitmap.width,
-			g->bitmap.rows,
-			0,
-			GL_RED,
-			GL_UNSIGNED_BYTE,
-			g->bitmap.buffer
-			);
+    static int c = 0;
+
+    m_font_shader.use();
+    m_font_shader["tex"] = 0;
+    m_font_shader["color1"] = entry.color1;
+    m_font_shader["color2"] = (entry.use_gradient ? entry.color2 : entry.color1);
+    m_font_shader["gradient"] = entry.gradient;
+    m_font_shader["projection"] = entry.proj;
+
+    for (p = entry.text.c_str(); *p; p++) {
+        if (FT_Load_Char(font.face, *p, FT_LOAD_RENDER))
+            continue;
 
 
-		float w = g->bitmap.width;
-		float h = g->bitmap.rows; 
-		w = entry.size.x * g->bitmap.width / (float)m_font_res;
-		h = entry.size.y * g->bitmap.rows / (float)m_font_res;
-		float b = g->metrics.horiBearingY/(64* (float)m_font_res)*entry.size.y - h;
-
-		GLfloat box[4][4] = {
-			{ x,     y-b    , 0, 1 },
-			{ x + w, y-b    , 1, 1 },
-			{ x,     y - h - b, 0, 0 },
-			{ x + w, y - h -b, 1, 0 },
-		};
-		
-		m_font_shader["modelview"] = glm::translate(glm::vec3(entry.pos.x, entry.pos.y, 0.0f)) * entry.mv;
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RED,
+            g->bitmap.width,
+            g->bitmap.rows,
+            0,
+            GL_RED,
+            GL_UNSIGNED_BYTE,
+            g->bitmap.buffer
+        );
 
 
-		sggBindVertexArray(m_font_vao);
-		glBindBuffer(GL_ARRAY_BUFFER, m_font_vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof box, box, GL_DYNAMIC_DRAW);
-		
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		x += std::max(w+ entry.size.x*0.05f, entry.size.x*0.15f);
-		y += entry.size.y*1.1f*(g->advance.y);
-	}
-	
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glFrontFace(GL_CCW);
+        float w = g->bitmap.width;
+        float h = g->bitmap.rows;
+        w = entry.size.x * g->bitmap.width / (float) m_font_res;
+        h = entry.size.y * g->bitmap.rows / (float) m_font_res;
+        float b = g->metrics.horiBearingY / (64 * (float) m_font_res) * entry.size.y - h;
+
+        GLfloat box[4][4] = {
+            {x, y - b, 0, 1},
+            {x + w, y - b, 1, 1},
+            {x, y - h - b, 0, 0},
+            {x + w, y - h - b, 1, 0},
+        };
+
+        m_font_shader["modelview"] = translate(glm::vec3(entry.pos.x, entry.pos.y, 0.0f)) * entry.mv;
+
+
+        sggBindVertexArray(m_font_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, m_font_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof box, box, GL_DYNAMIC_DRAW);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        x += std::max(w + entry.size.x * 0.05f, entry.size.x * 0.15f);
+        y += entry.size.y * 1.1f * (g->advance.y);
+    }
+    textureManager.unbindTexture(fontTexture);
+    glFrontFace(GL_CCW);
 }
 
-void FontLib::commitText()
-{
-	m_font_shader.use();
-	glEnable(GL_SCISSOR_TEST);
-	for (auto item : m_content)
-	{
-		drawText(item);
-	}
-	m_content.clear();
-	
+void FontLib::commitText() {
+    m_font_shader.use();
+    glEnable(GL_SCISSOR_TEST);
+    for (auto item: m_content) {
+        drawText(item);
+    }
+    m_content.clear();
 }
 
-void FontLib::setCanvas(glm::vec2 sz)
-{
-	m_canvas = sz;
+void FontLib::setCanvas(glm::vec2 sz) {
+    m_canvas = sz;
 }
 
-bool FontLib::setCurrentFont(std::string fontname)
-{
-	m_curr_font = m_fonts.find(fontname);
-	if (m_curr_font != m_fonts.end())
-		return true;
+bool FontLib::setCurrentFont(std::string fontname) {
+    m_curr_font = m_fonts.find(fontname);
+    if (m_curr_font != m_fonts.end())
+        return true;
 
-	Font font;
-	if (FT_New_Face(m_ft, fontname.c_str(), 0, &font.face))
-	{
-		return false;
-	}
-	FT_Set_Pixel_Sizes(font.face, 0, m_font_res);
+    Font font;
+    if (FT_New_Face(m_ft, fontname.c_str(), 0, &font.face)) {
+        return false;
+    }
+    FT_Set_Pixel_Sizes(font.face, 0, m_font_res);
 
-	glActiveTexture(GL_TEXTURE0);
-	glGenTextures(1, &font.font_tex);
-	glBindTexture(GL_TEXTURE_2D, font.font_tex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	m_curr_font = m_fonts.insert(std::pair<std::string, Font>(fontname,font)).first;
-	return true;
+    auto &textureManager = graphics::TextureManager::getInstance();
+    graphics::Texture *tex = textureManager.createTexture("font_texture_" + fontname, [&](graphics::Texture &tex) {
+        glGenTextures(1, tex.getIDPointer());
+        glBindTexture(GL_TEXTURE_2D, tex.getID());
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Set unpack alignment
+    });
+    font.font_tex = tex->getID();
+    m_curr_font = m_fonts.insert(std::pair<std::string, Font>(fontname, font)).first;
+    return true;
 }
-
 
 
 FT_Library FontLib::m_ft = nullptr;

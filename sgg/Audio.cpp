@@ -22,11 +22,7 @@
 #include <memory.h>
 #include <SDL2/SDL.h>
 
-<<<<<<< Updated upstream
-#include <sgg/audio.h>
-=======
 #include "headers/Audio.h"
->>>>>>> Stashed changes
 
 /*
  * Native WAVE format
