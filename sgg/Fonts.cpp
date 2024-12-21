@@ -184,7 +184,7 @@ bool FontLib::setCurrentFont(std::string fontname) {
     FT_Set_Pixel_Sizes(font.face, 0, m_font_res);
 
     auto &textureManager = graphics::TextureManager::getInstance();
-    graphics::Texture *tex = textureManager.createTexture("font_texture_" + fontname, [&](graphics::Texture &tex) {
+    graphics::Texture *tex = textureManager.createTexture("font_texture_" + fontname, false, [&](graphics::Texture &tex) {
         glGenTextures(1, tex.getIDPointer());
         glBindTexture(GL_TEXTURE_2D, tex.getID());
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

@@ -138,6 +138,8 @@ namespace graphics {
         int cur_pos_y; ///< The current y position in pixel units of the pointing device.
         int prev_pos_x; ///< The x position in pixel units of the pointing device in the previous update cycle.
         int prev_pos_y; ///< The y position in pixel units of the pointing device in the previous update cycle.
+        int rel_x;
+        int rel_y;
     };
 
 
@@ -465,8 +467,6 @@ namespace graphics {
     \endcode
     */
     void setPreDrawFunction(std::function<void()> pre_draw);
-
-    void setCustomDrawFunction(std::function<void()> custom_draw);
 
     void setPostDrawFunction(std::function<void()> post_draw);
 

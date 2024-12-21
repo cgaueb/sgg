@@ -6,12 +6,12 @@
 
 namespace graphics {
 
-    Texture* TextureManager::createTexture(const std::string& name, const std::function<void(Texture&)>& customBuildFunction = nullptr) {
+    Texture* TextureManager::createTexture(const std::string& name, bool useLodepng, const std::function<void(Texture&)>& customBuildFunction = nullptr) {
         Texture* texture = getTexture(name);
         if (texture) {
             return texture;
         }
-        texture = new Texture(name);
+        texture = new Texture(name, useLodepng);
 
         if (customBuildFunction) {
             texture->setCustomBuildFunction([texture, customBuildFunction]() { customBuildFunction(*texture); });
@@ -46,10 +46,9 @@ namespace graphics {
         if (slot >= maxSlots) {
             throw std::out_of_range("Texture slot exceeds maximum allowed slots.");
         }
-
-        // Bind the texture
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texture->getID());
+        texture->bindToSlot(slot);
         boundTextures[slot] = texture;
     }
 
@@ -81,6 +80,7 @@ namespace graphics {
             // Unbind the texture
             glActiveTexture(GL_TEXTURE0 + slot);
             glBindTexture(GL_TEXTURE_2D, 0);
+            boundTextures[slot]->bindToSlot(69420);
             boundTextures[slot] = nullptr;
         }
     }

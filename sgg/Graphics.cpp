@@ -137,10 +137,6 @@ namespace graphics {
         engine->setPreDrawCallback(pre_draw);
     }
 
-    void setCustomDrawFunction(std::function<void()> customdraw) {
-        engine->setCustomDrawCallback(customdraw);
-    }
-
     void setPostDrawFunction(std::function<void()> post_draw) {
         engine->setPostDrawCallback(post_draw);
     }
@@ -183,6 +179,9 @@ namespace graphics {
         engine->getPrevMousePosition(&x, &y);
         ms.prev_pos_x = x;
         ms.prev_pos_y = y;
+        engine->getRelativeMousePosition(&x, &y);
+        ms.rel_x = x;
+        ms.rel_y = y;
     }
 
     bool getKeyState(scancode_t key) {

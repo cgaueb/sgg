@@ -42,7 +42,7 @@ void graphics::Texture::makePowerOfTwo() {
 }
 
 bool graphics::Texture::load(const std::string &file) {
-    unsigned int error = lodepng::decode(m_buffer, m_width, m_height, file.c_str());
+    unsigned int error = lodepng::decode(m_buffer, m_width, m_height, file);
     return !error;
 }
 
@@ -65,10 +65,9 @@ bool graphics::Texture::buildGLTexture() {
     return true;
 }
 
-graphics::Texture::Texture(const std::string &filename): m_filename(filename) {
-    if (filename.size() >= 4 && filename.substr(filename.size() - 4) == ".ttf") {
-        std::cout << "True Type Font detected." << std::endl; return;
-    }
+graphics::Texture::Texture(const std::string &filename, bool useLodepng): m_filename(filename), useLodepng(useLodepng) {
+    if (filename.size() >= 4 && filename.substr(filename.size() - 4) == ".ttf") return;
+    if (!useLodepng) return;
     if (!load(filename)) return;
     makePowerOfTwo();
 }

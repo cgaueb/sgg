@@ -132,6 +132,10 @@ namespace graphics {
         button_array[2] = m_button_state[2];
     }
 
+    void GLBackend::getRelativeMousePosition(int *x, int *y) {
+        SDL_GetRelativeMouseState(x, y);
+    }
+
     void GLBackend::getMousePosition(int *x, int *y) {
         *x = m_mouse_pos.x;
         *y = m_mouse_pos.y;
@@ -185,8 +189,7 @@ namespace graphics {
     }
 
     bool GLBackend::processEvent(SDL_Event event) {
-        if (m_quit)
-            return false;
+        if (m_quit) return false;
 
         if (event.type == SDL_MOUSEMOTION) {
             m_prev_mouse_pos = m_mouse_pos;
@@ -196,30 +199,34 @@ namespace graphics {
         } else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
             bool new_state = (event.type == SDL_MOUSEBUTTONDOWN);
             switch (event.button.button) {
-                case SDL_BUTTON_LEFT: m_button_state[0] = new_state;
-                case SDL_BUTTON_MIDDLE: m_button_state[1] = new_state;
-                case SDL_BUTTON_RIGHT: m_button_state[2] = new_state;
+                case SDL_BUTTON_LEFT:
+                    m_button_state[0] = new_state;
+                break;
+                case SDL_BUTTON_MIDDLE:
+                    m_button_state[1] = new_state;
+                break;
+                case SDL_BUTTON_RIGHT:
+                    m_button_state[2] = new_state;
+                break;
             }
         } else if (event.type == SDL_KEYDOWN) {
-            switch (event.key.keysym.sym) {
-                case SDLK_ESCAPE:
-                    return false;
-
-                default:
-                    break;
+            if (event.key.keysym.sym == SDLK_ESCAPE) {
+                return false;
             }
         } else if (event.type == SDL_WINDOWEVENT) {
-            if (event.window.windowID == m_windowID) {
-                if (event.window.event == SDL_WINDOWEVENT_RESIZED || event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED
-                    || event.window.event == SDL_WINDOWEVENT_MAXIMIZED) {
-                    if (event.window.data1 != 0 && event.window.data2 != 0)
-                        resize(event.window.data1, event.window.data2);
+            if (event.window.windowID == m_windowID &&
+               (event.window.event == SDL_WINDOWEVENT_RESIZED ||
+                event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED ||
+                event.window.event == SDL_WINDOWEVENT_MAXIMIZED)) {
+                if (event.window.data1 != 0 && event.window.data2 != 0) {
+                    resize(event.window.data1, event.window.data2);
                 }
-            }
+                }
         }
 
         return true;
     }
+
 
     void GLBackend::advanceTime() {
         auto now = std::chrono::steady_clock::now();
@@ -386,7 +393,6 @@ namespace graphics {
             bool has_texture = false;
 
             if (!brush.texture.empty()) {
-                // Get and bind texture
                 texture = textureManager->getTexture(brush.texture);
                 if (texture) {
                     textureManager->bindTexture(texture);
@@ -462,7 +468,7 @@ namespace graphics {
         if (brush.fill_opacity > 0.0f || brush.fill_secondary_opacity > 0.0f) {
             bool has_texture = false;
             if (!brush.texture.empty()) {
-                texture = textureManager->createTexture(brush.texture, nullptr);
+                texture = textureManager->createTexture(brush.texture, true , nullptr);
                 if (texture) {
                     // Ensure the texture was successfully created
                     textureManager->bindTexture(texture);
@@ -903,29 +909,22 @@ namespace graphics {
         bck.outline_opacity = 0.0f;
         drawRect(m_requested_canvas.z / 2, m_requested_canvas.w / 2, m_requested_canvas.z, m_requested_canvas.w, bck);
 
-        if (m_predraw_callback != nullptr) {
-            m_flat_shader.use(false);
+        if (m_predraw_callback != nullptr)
+        {
             m_predraw_callback();
-        }
-
-        if (m_customdraw_callback != nullptr) {
-            m_customdraw_callback();
-        }
-
-        if (m_postdraw_callback != nullptr) {
-            m_postdraw_callback();
-            m_flat_shader.use(true);
+            m_flat_shader.use();
+            glEnable(GL_SCISSOR_TEST);
+            glDepthMask(0.0f);
+            glDisable(GL_DEPTH_TEST);
         }
 
         glEnable(GL_BLEND);
         glBlendEquation(GL_FUNC_ADD);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
-        //2D graphics
+
         m_flat_shader["P"] = m_projection;
 
         if (m_draw_callback != nullptr) {
-            m_flat_shader.use(true);
             m_draw_callback();
         }
 
@@ -933,6 +932,10 @@ namespace graphics {
         m_fontlib.commitText();
 
         glDisable(GL_SCISSOR_TEST);
+
+        if (m_postdraw_callback != nullptr) {
+            m_postdraw_callback();
+        }
         swap();
     }
 
@@ -942,10 +945,6 @@ namespace graphics {
 
     void GLBackend::setPreDrawCallback(std::function<void()> drf) {
         m_predraw_callback = drf;
-    }
-
-    void GLBackend::setCustomDrawCallback(std::function<void()> drf) {
-        m_customdraw_callback = drf;
     }
 
     void GLBackend::setPostDrawCallback(std::function<void()> drf) {
@@ -1027,7 +1026,7 @@ namespace graphics {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-        SDL_GL_SetSwapInterval(0);
+        SDL_SetRelativeMouseMode(SDL_TRUE);
 
 
         m_window = SDL_CreateWindow(m_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,

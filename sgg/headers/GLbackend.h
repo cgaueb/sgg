@@ -92,7 +92,6 @@ namespace graphics {
         void computeTransformation();
 
         std::function<void()> m_predraw_callback = nullptr;
-        std::function<void()> m_customdraw_callback = nullptr;
         std::function<void()> m_postdraw_callback = nullptr;
         std::function<void()> m_draw_callback = nullptr;
         std::function<void(float ms)> m_idle_callback = nullptr;
@@ -145,8 +144,6 @@ namespace graphics {
 
         void setPreDrawCallback(std::function<void()> drf);
 
-        void setCustomDrawCallback(std::function<void()> drf);
-
         void setPostDrawCallback(std::function<void()> drf);
 
         void setIdleCallback(std::function<void(float ms)> idf);
@@ -193,6 +190,8 @@ namespace graphics {
         void getMouseButtonReleased(bool *button_array);
 
         void getMouseButtonState(bool *button_array);
+
+        void getRelativeMousePosition(int *x, int *y);
 
         void getMousePosition(int *x, int *y);
 
