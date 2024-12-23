@@ -37,7 +37,7 @@ set(LIBS
 )
 
 # Add the executable with TEST.CPP along with other source files
-# add_executable(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/sgg/TEST.CPP ${SGG_SOURCES})
+#add_executable(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/sgg/TEST.CPP ${SGG_SOURCES})
 add_library(${PROJECT_NAME} ${CMAKE_SOURCE_DIR} ${SGG_SOURCES})
 
 # Include the third-party include directory

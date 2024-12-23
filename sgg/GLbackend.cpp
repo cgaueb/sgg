@@ -201,27 +201,31 @@ namespace graphics {
             switch (event.button.button) {
                 case SDL_BUTTON_LEFT:
                     m_button_state[0] = new_state;
-                break;
+                    break;
                 case SDL_BUTTON_MIDDLE:
                     m_button_state[1] = new_state;
-                break;
+                    break;
                 case SDL_BUTTON_RIGHT:
                     m_button_state[2] = new_state;
-                break;
+                    break;
             }
         } else if (event.type == SDL_KEYDOWN) {
             if (event.key.keysym.sym == SDLK_ESCAPE) {
-                return false;
+                if (SDL_GetRelativeMouseMode()) {
+                    SDL_SetRelativeMouseMode(SDL_FALSE);
+                } else {
+                    SDL_SetRelativeMouseMode(SDL_TRUE);
+                }
             }
         } else if (event.type == SDL_WINDOWEVENT) {
             if (event.window.windowID == m_windowID &&
-               (event.window.event == SDL_WINDOWEVENT_RESIZED ||
-                event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED ||
-                event.window.event == SDL_WINDOWEVENT_MAXIMIZED)) {
+                (event.window.event == SDL_WINDOWEVENT_RESIZED ||
+                 event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED ||
+                 event.window.event == SDL_WINDOWEVENT_MAXIMIZED)) {
                 if (event.window.data1 != 0 && event.window.data2 != 0) {
                     resize(event.window.data1, event.window.data2);
                 }
-                }
+            }
         }
 
         return true;
@@ -468,7 +472,7 @@ namespace graphics {
         if (brush.fill_opacity > 0.0f || brush.fill_secondary_opacity > 0.0f) {
             bool has_texture = false;
             if (!brush.texture.empty()) {
-                texture = textureManager->createTexture(brush.texture, true , nullptr);
+                texture = textureManager->createTexture(brush.texture, true, nullptr);
                 if (texture) {
                     // Ensure the texture was successfully created
                     textureManager->bindTexture(texture);
@@ -481,7 +485,6 @@ namespace graphics {
             m_flat_shader["gradient"] = glm::vec2(brush.gradient_dir_u, brush.gradient_dir_v);
             m_flat_shader["color1"] = glm::vec4(brush.fill_color[0], brush.fill_color[1], brush.fill_color[2],
                                                 brush.fill_opacity);
-
             m_flat_shader["color2"] = brush.gradient
                                           ? glm::vec4(brush.fill_secondary_color[0], brush.fill_secondary_color[1],
                                                       brush.fill_secondary_color[2], brush.fill_secondary_opacity)
@@ -505,7 +508,7 @@ namespace graphics {
         }
 
         // Outline logic
-        if (brush.outline_opacity > 0.0f) {
+        if (brush.outline_opacity == 0.0f) {
             glm::vec4 outline_color = glm::vec4(brush.outline_color[0], brush.outline_color[1],
                                                 brush.outline_color[2], brush.outline_opacity);
             m_flat_shader["color1"] = outline_color;
@@ -694,8 +697,8 @@ namespace graphics {
             sggBindVertexArray(m_sector_outline_vao);
             glBindBuffer(GL_ARRAY_BUFFER, m_sector_outline_vbo);
 
-                glBufferData(GL_ARRAY_BUFFER, sizeof sector_outline_vertices, sector_outline_vertices, GL_DYNAMIC_DRAW
-                );
+            glBufferData(GL_ARRAY_BUFFER, sizeof sector_outline_vertices, sector_outline_vertices, GL_DYNAMIC_DRAW
+            );
 
             unsigned int attrib_flat_position = m_flat_shader.getAttributeLocation("coord");
             glEnableVertexAttribArray(attrib_flat_position);
@@ -731,7 +734,6 @@ namespace graphics {
     }
 
     void *GLBackend::getUserData() {
-        /* Safely cast const away */
         return const_cast<void *>(m_user_data);
     }
 
@@ -784,9 +786,9 @@ namespace graphics {
         return loop;
     }
 
-    void GLBackend::setVSYNC(int input){
-		SDL_GL_SetSwapInterval(input);
-	}
+    void GLBackend::setVSYNC(int input) {
+        SDL_GL_SetSwapInterval(input);
+    }
 
     float GLBackend::getFPS() const {
         return m_fps;
@@ -909,8 +911,7 @@ namespace graphics {
         bck.outline_opacity = 0.0f;
         drawRect(m_requested_canvas.z / 2, m_requested_canvas.w / 2, m_requested_canvas.z, m_requested_canvas.w, bck);
 
-        if (m_predraw_callback != nullptr)
-        {
+        if (m_predraw_callback != nullptr) {
             m_predraw_callback();
             m_flat_shader.use();
             glEnable(GL_SCISSOR_TEST);
