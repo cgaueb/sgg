@@ -27,9 +27,13 @@ namespace graphics {
         Texture* getTexture(unsigned int textureID) const;
         void bindTexture(Texture* texture, unsigned int slot);
         void bindTexture(Texture *texture);
-        void unbindTexture(unsigned int slot);
+        void unbindTexture(int slot);
         void unbindTexture(Texture* texture);
         void unbindAllTextures();
+        std::vector<Texture*> getBoundTextures();
+        std::unordered_map<std::string, Texture*> getTextures();
+
+
 
         TextureManager(const TextureManager&) = delete;
         TextureManager& operator=(const TextureManager&) = delete;

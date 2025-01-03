@@ -232,14 +232,6 @@ namespace graphics {
     }
 
 
-    void GLBackend::advanceTime() {
-        auto now = std::chrono::steady_clock::now();
-        std::chrono::duration<float> elapsed_seconds = now - m_prev_time_tick;
-        m_delta_time = elapsed_seconds.count() * 1000.0f;
-        m_global_time += m_delta_time;
-        m_prev_time_tick = now;
-    }
-
     void GLBackend::computeProjection() {
         float w, h;
         float n = -1.0f, f = 1.0f;
@@ -508,7 +500,7 @@ namespace graphics {
         }
 
         // Outline logic
-        if (brush.outline_opacity == 0.0f) {
+        if (brush.outline_opacity > 0.0f) {
             glm::vec4 outline_color = glm::vec4(brush.outline_color[0], brush.outline_color[1],
                                                 brush.outline_color[2], brush.outline_opacity);
             m_flat_shader["color1"] = outline_color;
@@ -778,10 +770,10 @@ namespace graphics {
         if (m_idle_callback != nullptr) {
             m_idle_callback(getDeltaTime());
         }
+        capFPS();
+        advanceTime();
         draw();
         calculateFPS();
-        advanceTime();
-        //SDL_Delay(5);
 
         return loop;
     }
@@ -794,6 +786,30 @@ namespace graphics {
         return m_fps;
     }
 
+    void GLBackend::setTargetFPS(int fps) {
+        if (fps == -1) {
+            m_target_fps = std::numeric_limits<int>::max(); // Uncap FPS
+        } else {
+            m_target_fps = fps; // Set target FPS
+        }
+    }
+
+    void GLBackend::capFPS() {
+        float target_frame_time = (m_target_fps == std::numeric_limits<int>::max()) ? 0 : (1000.0f / m_target_fps);
+
+        Uint32 current_time = SDL_GetTicks();
+        Uint32 frame_duration = current_time - m_frame_start_time;
+
+        // Delay if we need to cap the FPS
+        if (target_frame_time > 0 && frame_duration < target_frame_time) {
+            SDL_Delay(static_cast<Uint32>(target_frame_time - frame_duration));
+        }
+
+        // Calculate delta time for the current frame
+        m_delta_time = (SDL_GetTicks() - m_frame_start_time) / 1000.0f; // Convert to seconds
+        m_frame_start_time = SDL_GetTicks(); // Update frame start time
+    }
+
     void GLBackend::calculateFPS() {
         m_frame_count++;
         m_time_accumulator += m_delta_time;
@@ -804,6 +820,14 @@ namespace graphics {
             m_frame_count = 0;
             m_time_accumulator = 0.0f;
         }
+    }
+
+    void GLBackend::advanceTime() {
+        auto now = std::chrono::steady_clock::now();
+        std::chrono::duration<float> elapsed_seconds = now - m_prev_time_tick;
+        m_delta_time = elapsed_seconds.count() * 1000.0f;
+        m_global_time += m_delta_time;
+        m_prev_time_tick = now;
     }
 
     void GLBackend::update(float delta_time) {

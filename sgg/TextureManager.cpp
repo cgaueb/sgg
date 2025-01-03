@@ -5,9 +5,9 @@
 #include <GL/glew.h>
 
 namespace graphics {
-
-    Texture* TextureManager::createTexture(const std::string& name, bool useLodepng, const std::function<void(Texture&)>& customBuildFunction = nullptr) {
-        Texture* texture = getTexture(name);
+    Texture *TextureManager::createTexture(const std::string &name, bool useLodepng,
+                                           const std::function<void(Texture &)> &customBuildFunction = nullptr) {
+        Texture *texture = getTexture(name);
         if (texture) {
             return texture;
         }
@@ -22,7 +22,7 @@ namespace graphics {
         return texture;
     }
 
-    Texture* TextureManager::getTexture(const std::string& name) {
+    Texture *TextureManager::getTexture(const std::string &name) {
         auto it = textures.find(name);
         if (it != textures.end()) {
             return it->second;
@@ -30,9 +30,9 @@ namespace graphics {
         return nullptr;
     }
 
-    Texture* TextureManager::getTexture(const unsigned int textureID) const {
-        for (const auto&[fst, snd] : textures) {
-            if (Texture* texture = snd; texture->getID() == textureID) {
+    Texture *TextureManager::getTexture(const unsigned int textureID) const {
+        for (const auto &[fst, snd]: textures) {
+            if (Texture *texture = snd; texture->getID() == textureID) {
                 return texture;
             }
         }
@@ -46,6 +46,7 @@ namespace graphics {
         if (slot >= maxSlots) {
             throw std::out_of_range("Texture slot exceeds maximum allowed slots.");
         }
+
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texture->getID());
         texture->bindToSlot(slot);
@@ -71,7 +72,7 @@ namespace graphics {
         std::cerr << "No available texture slots to bind the texture." << std::endl;
     }
 
-    void TextureManager::unbindTexture(unsigned int slot) {
+    void TextureManager::unbindTexture(int slot) {
         if (slot >= maxSlots) {
             std::cerr << "Texture slot exceeds maximum allowed slots." << std::endl;
             return;
@@ -106,6 +107,14 @@ namespace graphics {
                 unbindTexture(i);
             }
         }
+    }
+
+    std::unordered_map<std::string, Texture *> TextureManager::getTextures() {
+        return textures;
+    }
+
+    std::vector<Texture *> TextureManager::getBoundTextures() {
+        return boundTextures;
     }
 
     TextureManager::~TextureManager() {

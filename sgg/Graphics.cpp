@@ -94,6 +94,11 @@ namespace graphics {
         return engine->getFPS();
     }
 
+    void setTargetFPS(int fps) {
+        return engine->setTargetFPS(fps);
+    }
+
+
     void setVSYNC(bool VSYNC) {
         VSYNC ? engine->setVSYNC(1) : engine->setVSYNC(0);
     }

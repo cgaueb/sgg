@@ -1,5 +1,6 @@
 #include "headers/Fonts.h"
 #include <algorithm>
+#include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -83,7 +84,8 @@ void FontLib::submitText(const TextRecord &text) {
     m_content.push_back(text);
 }
 
-void FontLib::drawText(TextRecord entry) {
+void FontLib::drawText(TextRecord entry)
+{
     float x = 0.0f;
     float y = 0.0f;
 
@@ -100,16 +102,17 @@ void FontLib::drawText(TextRecord entry) {
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     auto &textureManager = graphics::TextureManager::getInstance();
     graphics::Texture *fontTexture = textureManager.getTexture(font.font_tex);
-    textureManager.bindTexture(fontTexture);
-
-    static int c = 0;
+    textureManager.bindTexture(fontTexture, 31);
 
     m_font_shader.use();
+
     m_font_shader["tex"] = 0;
+
     m_font_shader["color1"] = entry.color1;
-    m_font_shader["color2"] = (entry.use_gradient ? entry.color2 : entry.color1);
+    m_font_shader["color2"] = (entry.use_gradient? entry.color2 : entry.color1);
     m_font_shader["gradient"] = entry.gradient;
     m_font_shader["projection"] = entry.proj;
 
@@ -128,23 +131,23 @@ void FontLib::drawText(TextRecord entry) {
             GL_RED,
             GL_UNSIGNED_BYTE,
             g->bitmap.buffer
-        );
+            );
 
 
         float w = g->bitmap.width;
         float h = g->bitmap.rows;
-        w = entry.size.x * g->bitmap.width / (float) m_font_res;
-        h = entry.size.y * g->bitmap.rows / (float) m_font_res;
-        float b = g->metrics.horiBearingY / (64 * (float) m_font_res) * entry.size.y - h;
+        w = entry.size.x * g->bitmap.width / (float)m_font_res;
+        h = entry.size.y * g->bitmap.rows / (float)m_font_res;
+        float b = g->metrics.horiBearingY/(64* (float)m_font_res)*entry.size.y - h;
 
         GLfloat box[4][4] = {
-            {x, y - b, 0, 1},
-            {x + w, y - b, 1, 1},
-            {x, y - h - b, 0, 0},
-            {x + w, y - h - b, 1, 0},
+            { x,     y-b    , 0, 1 },
+            { x + w, y-b    , 1, 1 },
+            { x,     y - h - b, 0, 0 },
+            { x + w, y - h -b, 1, 0 },
         };
 
-        m_font_shader["modelview"] = translate(glm::vec3(entry.pos.x, entry.pos.y, 0.0f)) * entry.mv;
+        m_font_shader["modelview"] = glm::translate(glm::vec3(entry.pos.x, entry.pos.y, 0.0f)) * entry.mv;
 
 
         sggBindVertexArray(m_font_vao);
@@ -152,12 +155,15 @@ void FontLib::drawText(TextRecord entry) {
         glBufferData(GL_ARRAY_BUFFER, sizeof box, box, GL_DYNAMIC_DRAW);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        x += std::max(w + entry.size.x * 0.05f, entry.size.x * 0.15f);
-        y += entry.size.y * 1.1f * (g->advance.y);
+        x += std::max(w+ entry.size.x*0.05f, entry.size.x*0.15f);
+        y += entry.size.y*1.1f*(g->advance.y);
     }
-    textureManager.unbindTexture(fontTexture);
+    textureManager.unbindTexture(31);
     glFrontFace(GL_CCW);
 }
+
+
+
 
 void FontLib::commitText() {
     m_font_shader.use();
@@ -184,7 +190,7 @@ bool FontLib::setCurrentFont(std::string fontname) {
     FT_Set_Pixel_Sizes(font.face, 0, m_font_res);
 
     auto &textureManager = graphics::TextureManager::getInstance();
-    graphics::Texture *tex = textureManager.createTexture("font_texture_" + fontname, false, [&](graphics::Texture &tex) {
+    graphics::Texture *tex = textureManager.createTexture(fontname, false, [&](graphics::Texture &tex) {
         glGenTextures(1, tex.getIDPointer());
         glBindTexture(GL_TEXTURE_2D, tex.getID());
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -195,6 +201,17 @@ bool FontLib::setCurrentFont(std::string fontname) {
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Set unpack alignment
     });
     font.font_tex = tex->getID();
+    textureManager.bindTexture(tex, 31);
+
+    /*glActiveTexture(GL_TEXTURE0);
+    glGenTextures(1, &font.font_tex);
+    glBindTexture(GL_TEXTURE_2D, font.font_tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);*/
+
     m_curr_font = m_fonts.insert(std::pair<std::string, Font>(fontname, font)).first;
     return true;
 }

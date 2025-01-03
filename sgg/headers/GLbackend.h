@@ -98,9 +98,11 @@ namespace graphics {
         std::function<void(int w, int h)> m_resize_callback = nullptr;
 
         float m_fps = 0.0f;
+        float m_target_fps = 60.0f;
         int m_frame_count = 0;
         float m_fps_update_interval = 1000.0f; // Update FPS every second (1000ms)
         float m_time_accumulator = 0.0f;
+        Uint32 m_frame_start_time = 0;
 
     public:
         TextureManager *getTextureManager() const { return textureManager; }
@@ -108,6 +110,10 @@ namespace graphics {
         void calculateFPS();
 
         float getFPS() const;
+
+        void setTargetFPS(int fps);
+
+        void capFPS();
 
         static void setVSYNC(int input);
 

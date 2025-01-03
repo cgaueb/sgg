@@ -282,9 +282,11 @@ namespace graphics {
     */
 
     float getFPS();
-	
+
+    void setTargetFPS(int fps);
+
     void setVSYNC(bool VSYNC = true);
-	
+
     float windowToCanvasX(float x, bool clamped = true);
 
     /** Converts the vertical window coordinate of a point to the corresponding canvas coordinate.
