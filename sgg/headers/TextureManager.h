@@ -25,8 +25,8 @@ namespace graphics {
         Texture* createTexture(const std::string &name, bool useLodepng, const std::function<void(Texture &)> &customBuildFunction);
         Texture* getTexture(const std::string& file);
         Texture* getTexture(unsigned int textureID) const;
-        void bindTexture(Texture* texture, unsigned int slot);
-        void bindTexture(Texture *texture);
+        int getBoundSlotOfTexture(Texture* texture) const;
+        void bindTexture(Texture *texture, int slot);
         void unbindTexture(int slot);
         void unbindTexture(Texture* texture);
         void unbindAllTextures();

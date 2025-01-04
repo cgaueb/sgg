@@ -391,7 +391,7 @@ namespace graphics {
             if (!brush.texture.empty()) {
                 texture = textureManager->getTexture(brush.texture);
                 if (texture) {
-                    textureManager->bindTexture(texture);
+                    textureManager->bindTexture(texture, 30);
                     has_texture = true;
                 }
             }
@@ -408,7 +408,7 @@ namespace graphics {
                                                       brush.fill_opacity);
 
             m_flat_shader["MV"] = identity_matrix;
-            m_flat_shader["tex"] = 0; // Texture slot
+            m_flat_shader["tex"] = 30; // Texture slot
 
             // Bind and draw the triangle
             unsigned int attrib_flat_position = m_flat_shader.getAttributeLocation("coord");
@@ -421,7 +421,7 @@ namespace graphics {
 
             // Unbind texture if used
             if (texture) {
-                textureManager->unbindTexture(texture);
+                textureManager->unbindTexture(30);
             }
         }
 
@@ -467,7 +467,7 @@ namespace graphics {
                 texture = textureManager->createTexture(brush.texture, true, nullptr);
                 if (texture) {
                     // Ensure the texture was successfully created
-                    textureManager->bindTexture(texture);
+                    textureManager->bindTexture(texture, 30);
                     has_texture = true;
                 } else {
                     std::cerr << "Warning: Failed to create texture: " << brush.texture << std::endl;
@@ -484,7 +484,7 @@ namespace graphics {
                                                       brush.fill_opacity);
 
             m_flat_shader["MV"] = mat;
-            m_flat_shader["tex"] = 0;
+            m_flat_shader["tex"] = 30;
 
             unsigned int attrib_flat_position = m_flat_shader.getAttributeLocation("coord");
             sggBindVertexArray(m_rect_vao);
@@ -495,7 +495,7 @@ namespace graphics {
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
             if (texture) {
-                textureManager->unbindTexture(texture);
+                textureManager->unbindTexture(30);
             }
         }
 
@@ -648,7 +648,7 @@ namespace graphics {
             if (!brush.texture.empty()) {
                 texture = textureManager->getTexture(brush.texture);
                 if (texture) {
-                    textureManager->bindTexture(texture);
+                    textureManager->bindTexture(texture, 30);
                     has_texture = true;
                 }
             }
@@ -661,7 +661,7 @@ namespace graphics {
                                                       brush.fill_secondary_color[2], brush.fill_secondary_opacity)
                                           : glm::vec4(brush.fill_color[0], brush.fill_color[1], brush.fill_color[2],
                                                       brush.fill_opacity);
-            m_flat_shader["tex"] = 0;
+            m_flat_shader["tex"] = 30;
 
             sggBindVertexArray(m_sector_vao);
             glBindBuffer(GL_ARRAY_BUFFER, m_sector_vbo);
@@ -673,7 +673,7 @@ namespace graphics {
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 2 * CURVE_SUBDIVS + 2);
 
             if (texture) {
-                textureManager->unbindTexture(texture);
+                textureManager->unbindTexture(30);
             }
         }
 

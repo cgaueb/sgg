@@ -39,7 +39,16 @@ namespace graphics {
         return nullptr;
     }
 
-    void TextureManager::bindTexture(Texture *texture, unsigned int slot) {
+    int TextureManager::getBoundSlotOfTexture(Texture *texture) const {
+        for (unsigned int i = 0; i < maxSlots; ++i) {
+            if (boundTextures[i] == texture) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    void TextureManager::bindTexture(Texture *texture, int slot) {
         if (!texture || texture->getID() == 0) {
             throw std::invalid_argument("Invalid texture: Cannot bind a null or uninitialized texture.");
         }
@@ -47,29 +56,13 @@ namespace graphics {
             throw std::out_of_range("Texture slot exceeds maximum allowed slots.");
         }
 
+        if (boundTextures[slot] != nullptr) {
+            unbindTexture(slot);
+        }
+
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texture->getID());
-        texture->bindToSlot(slot);
         boundTextures[slot] = texture;
-    }
-
-    void TextureManager::bindTexture(Texture *texture) {
-        if (!texture || texture->getID() == 0) {
-            std::cerr << "Attempted to bind a null or uninitialized texture." << std::endl;
-            return;
-        }
-        for (unsigned int i = 0; i < maxSlots; ++i) {
-            if (boundTextures[i] == texture) {
-                return;
-            }
-        }
-        for (unsigned int i = 0; i < maxSlots; ++i) {
-            if (!boundTextures[i]) {
-                bindTexture(texture, i);
-                return;
-            }
-        }
-        std::cerr << "No available texture slots to bind the texture." << std::endl;
     }
 
     void TextureManager::unbindTexture(int slot) {
@@ -81,7 +74,6 @@ namespace graphics {
             // Unbind the texture
             glActiveTexture(GL_TEXTURE0 + slot);
             glBindTexture(GL_TEXTURE_2D, 0);
-            boundTextures[slot]->bindToSlot(69420);
             boundTextures[slot] = nullptr;
         }
     }

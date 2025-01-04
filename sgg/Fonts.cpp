@@ -107,10 +107,8 @@ void FontLib::drawText(TextRecord entry)
     graphics::Texture *fontTexture = textureManager.getTexture(font.font_tex);
     textureManager.bindTexture(fontTexture, 31);
 
-    m_font_shader.use();
-
-    m_font_shader["tex"] = 0;
-
+    m_font_shader.use(true);
+    m_font_shader["tex"] =  31;
     m_font_shader["color1"] = entry.color1;
     m_font_shader["color2"] = (entry.use_gradient? entry.color2 : entry.color1);
     m_font_shader["gradient"] = entry.gradient;
@@ -201,17 +199,6 @@ bool FontLib::setCurrentFont(std::string fontname) {
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Set unpack alignment
     });
     font.font_tex = tex->getID();
-    textureManager.bindTexture(tex, 31);
-
-    /*glActiveTexture(GL_TEXTURE0);
-    glGenTextures(1, &font.font_tex);
-    glBindTexture(GL_TEXTURE_2D, font.font_tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);*/
-
     m_curr_font = m_fonts.insert(std::pair<std::string, Font>(fontname, font)).first;
     return true;
 }
