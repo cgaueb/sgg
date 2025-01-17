@@ -14,6 +14,7 @@
 #define SGG_CHECK_GL() do {GLenum err;while((err = glGetError()) != GL_NO_ERROR){ printf("Error %s %d\n", (const char*)glewGetErrorString(err), err);exit(0);}printf("Pass\n");} while(0);
 
 constexpr auto CURVE_SUBDIVS = 64;
+inline auto GLEW_INIT = false;
 
 //#undef main
 namespace graphics {

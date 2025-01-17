@@ -1,5 +1,5 @@
 #include "headers/Shader.h"
-
+#include "headers/GLbackend.h"
 #include <codecvt>
 #include <GL/glew.h>
 #include <iostream>
@@ -9,7 +9,10 @@
 #include <sstream>
 #include <vector>
 
+
 Shader::Shader(const char *vertex_str, const char *fragment_str) {
+    if (!GLEW_INIT) return;
+
     if (!vertex_str || !fragment_str) {
         std::cerr << "Error: Shader paths cannot be null.\n";
         return;
@@ -176,9 +179,10 @@ Uniform &Shader::getUniform(const char *_uniform) {
 
     // Update the "isSmart" property if needed
     if (inserted) {
-        if (iter->second == -1) {  // OpenGL returns -1 if the uniform is not found
+        if (iter->second == -1) {
+            // OpenGL returns -1 if the uniform is not found
             std::cerr << "Warning: Uniform '" << uniformName
-                      << "' not found in program " << program << std::endl;
+                    << "' not found in program " << program << std::endl;
         }
         iter->second.isSmart = isSmart;
     }

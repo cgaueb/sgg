@@ -1047,8 +1047,6 @@ namespace graphics {
         //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
         SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -1065,7 +1063,31 @@ namespace graphics {
             return false;
         }
 
+
+        // Try OpenGL 4.3
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
         m_context = SDL_GL_CreateContext(m_window);
+
+        if (!m_context) {
+            std::cout << "OpenGL 4.3 context creation failed. Falling back to OpenGL 4.0...\n";
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0); // Change to 4.0
+            m_context = SDL_GL_CreateContext(m_window);
+
+            if (!m_context) {
+                std::cout << "OpenGL 4.0 context creation failed. Falling back to OpenGL 3.0...\n";
+                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0); // Change to 3.0
+                m_context = SDL_GL_CreateContext(m_window);
+
+                if (!m_context) {
+                    std::cout << "OpenGL 3.0 context creation failed. Unable to initialize OpenGL context.\n";
+                    CheckSDLError(__LINE__);
+                    return false;
+                }
+            }
+        }
+
 
         glewExperimental = GL_TRUE;
         glewInit();
@@ -1078,6 +1100,8 @@ namespace graphics {
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(debugMessageCallback, nullptr);
+
+        GLEW_INIT = true;
 
         bool init = m_fontlib.init();
         if (!init) {
