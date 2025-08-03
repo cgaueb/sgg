@@ -1,3 +1,32 @@
 .idea
 build/
 .DS_Store
+
+# Build artifacts
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+*.obj
+*.o
+*.a
+*.lib
+*.dll
+*.exe
+*.app
+
+# IDE directories
+.vscode/
+.vs/
+
+# Visual Studio solutions/projects
+*.sln
+*.vcxproj*
+*.user
+*.pdb
+
+# Logs
+*.log
+
+# Binary / output folders
+bin/
+out/
