@@ -65,6 +65,9 @@ namespace graphics
 		GLuint		m_sector_vao;
 		GLuint		m_sector_outline_vbo;
 		GLuint		m_sector_outline_vao;
+		GLuint		m_curve_vbo_lod[3];
+		GLuint		m_curve_vao_lod[3];
+		float *		m_curve_vertices[3];
 
 		glm::vec4	m_window_to_canvas_factors;
 
@@ -86,12 +89,15 @@ namespace graphics
 		void initPrimitives();
 		void computeTransformation();
 
+		std::function<void()> m_predraw_callback = nullptr;
+		std::function<void()> m_postdraw_callback = nullptr;
 		std::function<void()> m_draw_callback = nullptr;
 		std::function<void(float ms)> m_idle_callback = nullptr;
 		std::function<void(int w, int h)> m_resize_callback = nullptr;
 
 	public:
 		void drawRect(float cx, float cy, float w, float h, const struct Brush & brush);
+		void drawBezier(float* ep1, float* cp1, float* cp2, float* ep2, const Brush& brush);
 		void drawLine(float x_1, float y_1, float x_2, float y_2, const struct Brush & brush);
 		void drawSector(float cx, float cy, float start_angle, float end_angle, float radius1, float radius2, const struct Brush & brush);
 		void drawText(float pos_x, float pos_y, float size, const std::string & text, const Brush & brush);
@@ -103,10 +109,14 @@ namespace graphics
 		void setOrientation(float degrees);
 		void resetPose();
 		bool setFont(std::string fontname);
-		std::vector<std::string> preloadBitmaps(std::string dir);
+		std::vector<std::string> preloadBitmaps(const std::string & dir);
+		bool updateBitmapData(const std::string& bitmap_name, const unsigned char* buffer);
+		bool getBitmapData(const std::string& bitmap_name, unsigned char** buffer, unsigned int* width, unsigned int* height);
 
 		bool getKeyState(scancode_t key);
 		void setDrawCallback(std::function<void()> drf);
+		void setPreDrawCallback(std::function<void()> drf);
+		void setPostDrawCallback(std::function<void()> drf);
 		void setIdleCallback(std::function<void(float ms)> idf);
 		void setResizeCallback(std::function<void(int w, int h)> rsf);
 		virtual bool init();

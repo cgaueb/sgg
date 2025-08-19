@@ -26,6 +26,12 @@ namespace graphics
 		engine->drawLine(x1, y1, x2, y2, brush);
 	}
 
+	void drawBezier(float* ep1, float* cp1, float* cp2, float* ep2, const Brush& brush)
+	{
+		engine->drawBezier(ep1, cp1, cp2, ep2, brush);
+	}
+
+
 	bool setFont(std::string fontname)
 	{
 		return engine->setFont(fontname);
@@ -61,9 +67,19 @@ namespace graphics
 		engine->resetPose();
 	}
 
-	std::vector<std::string> preloadBitmaps(std::string dir)
+	std::vector<std::string> preloadBitmaps(const std::string & dir)
 	{
 		return engine->preloadBitmaps(dir);
+	}
+
+	bool getBitmapData(const std::string& bitmap_name, unsigned char** buffer, unsigned int* width, unsigned int* height)
+	{
+		return engine->getBitmapData(bitmap_name, buffer, width, height);
+	}
+
+	bool updateBitmapData(const std::string& bitmap_name, const unsigned char* buffer)
+	{
+		return engine->updateBitmapData(bitmap_name, buffer);
 	}
 
 	void playSound(std::string soundfile, float volume, bool looping)
@@ -145,6 +161,16 @@ namespace graphics
 	void setDrawFunction(std::function<void()> fdraw)
 	{
 		engine->setDrawCallback(fdraw);
+	}
+
+	void setPreDrawFunction(std::function<void()> fdraw)
+	{
+		engine->setPreDrawCallback(fdraw);
+	}
+
+	void setPostDrawFunction(std::function<void()> fdraw)
+	{
+		engine->setPostDrawCallback(fdraw);
 	}
 
 	void setUpdateFunction(std::function<void(float)> fupdate)

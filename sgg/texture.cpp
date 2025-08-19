@@ -33,7 +33,7 @@ void graphics::Texture::makePowerOfTwo()
 				image2[4 * (i*u2 + j) + c] = (unsigned char)roundf(valy);
 			}
 		}
-
+	
 	m_buffer = std::move(image2);
 	m_width = u2;
 	m_height = v2;
@@ -59,6 +59,15 @@ void graphics::Texture::buildGLTexture()
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void graphics::Texture::updateGLTexture()
+{
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, m_id);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, &m_buffer[0]);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 graphics::Texture::Texture(const std::string & filename)
 {
 	m_filename = filename;
@@ -68,7 +77,7 @@ graphics::Texture::Texture(const std::string & filename)
 	buildGLTexture();
 }
 
-GLuint graphics::TextureManager::getTexture(std::string file)
+GLuint graphics::TextureManager::getTexture(const std::string & file)
 {
 	auto iter = textures.find(file);
 	if (iter != textures.end())
@@ -82,4 +91,18 @@ GLuint graphics::TextureManager::getTexture(std::string file)
 		return texinfo.second.getID();
 	}
 	
+}
+
+graphics::Texture * graphics::TextureManager::getTextureObject(const std::string & file)
+{
+	auto iter = textures.find(file);
+	if (iter != textures.end())
+	{
+		return &(iter->second);
+	}
+	else
+	{
+		return nullptr;
+	}
+
 }

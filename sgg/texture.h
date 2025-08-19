@@ -18,12 +18,14 @@ namespace graphics
 		void makePowerOfTwo();
 		bool load(const std::string & file);
 		void buildGLTexture();
+		
 	public:
 		Texture(const std::string & filename);
 		GLuint getID() { return m_id; }
 		int getWidth() { return m_width; }
 		int getHeight() { return m_height; }
-		
+		unsigned char* getDataPtr() { return &(m_buffer[0]); }
+		void updateGLTexture();
 	};
 
 	class TextureManager
@@ -31,6 +33,7 @@ namespace graphics
 	private:
 		std::unordered_map<std::string, Texture> textures;
 	public:
-		GLuint getTexture(std::string file);
+		GLuint getTexture(const std::string & file);
+		Texture * getTextureObject(const std::string & file);
 	};
 }

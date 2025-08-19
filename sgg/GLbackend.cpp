@@ -9,12 +9,16 @@
 #include <glm/gtx/transform.hpp>
 #include <sgg/commonshaders.h>
 #include <sgg/graphics.h>
-#include <filesystem>
 #include <cctype>
 
-#ifdef  _EXPERIMENTAL_FILESYSTEM_
+#ifdef  _WIN32 || _WIN64
+	#if _MSC_VER >= 1930
+		#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+	#endif
+#include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #else
+#include <filesystem>
 namespace fs = std::filesystem;
 #endif
 
@@ -62,6 +66,12 @@ namespace graphics
 
 	GLBackend::~GLBackend()
 	{
+		if (m_curve_vertices[0])
+			delete[] m_curve_vertices[0];
+		if (m_curve_vertices[1])
+			delete[] m_curve_vertices[1];
+		if (m_curve_vertices[2])
+			delete[] m_curve_vertices[2];
 	}
 
 	void GLBackend::makeCurrent()
@@ -338,6 +348,11 @@ namespace graphics
 			sector_vertices[2 * CURVE_SUBDIVS - i - 1][3] = 1.0f;
 		}
 
+		m_curve_vertices[0] = new float [4 * CURVE_SUBDIVS / 2];
+		m_curve_vertices[1] = new float [4 * CURVE_SUBDIVS];
+		m_curve_vertices[2] = new float [4 * CURVE_SUBDIVS * 2];
+		
+
 		sggGenVertexArrays(1, &m_sector_vao);
 		sggBindVertexArray(m_sector_vao);
 		glGenBuffers(1, &m_sector_vbo);
@@ -472,7 +487,7 @@ namespace graphics
 		glDrawArrays(GL_LINES, 0, 2);
 	}
 
-	std::vector<std::string> GLBackend::preloadBitmaps(std::string dir)
+	std::vector<std::string> GLBackend::preloadBitmaps(const std::string & dir)
 	{
 		std::vector<std::string> names;
 		Brush brush;
@@ -480,7 +495,6 @@ namespace graphics
 		for (auto& entry : fs::directory_iterator(dir))
 		{
 			std::string filename = entry.path().string();
-			// std::cout << filename ;
 			// TODO: for now, using MSVC17-compliant code, where
 			// filesystem classes are not fully implemented.
 			std::string extension = filename.substr(filename.length() - 4, 4);
@@ -498,6 +512,49 @@ namespace graphics
 		}
 		return names;
 	}
+
+	void GLBackend::drawBezier(float* ep1, float* cp1, float* cp2, float* ep2, const Brush& brush)
+	{
+		if (brush.outline_opacity == 0.0f)
+			return;
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		m_flat_shader["MV"] = m_transformation;
+		m_flat_shader["gradient"] = glm::vec2(brush.gradient_dir_u, brush.gradient_dir_v);
+
+		float curve_vertices[CURVE_SUBDIVS + 1][4];
+		for (int i = 0; i <= CURVE_SUBDIVS; i++)
+		{
+			float t = i / (float)CURVE_SUBDIVS;
+			float t2 = t * t;
+			float b1 = 1.0f - t; b1 = b1 * b1 * b1;
+			float b2 = 3.0f * (1.0f - t) * (1.0f - t) * t;
+			float b3 = 3.0f * (1.0f - t) * t2;
+			float b4 = t2*t;
+			curve_vertices[i][0] = ep1[0] * b1 + cp1[0] * b2 + cp2[0] * b3 + ep2[0] * b4;
+			curve_vertices[i][1] = ep1[1] * b1 + cp1[1] * b2 + cp2[1] * b3 + ep2[1] * b4;
+			curve_vertices[i][2] = t;
+			curve_vertices[i][3] = 0.0f;
+		}
+
+		m_flat_shader.use();
+		m_flat_shader["color1"] = glm::vec4(brush.outline_color[0], brush.outline_color[1], brush.outline_color[2], brush.outline_opacity);
+		m_flat_shader["color2"] = glm::vec4(brush.outline_color[0], brush.outline_color[1], brush.outline_color[2], brush.outline_opacity);
+		m_flat_shader["has_texture"] = 0;
+		glLineWidth(brush.outline_width);
+
+		sggBindVertexArray(m_sector_outline_vao);
+		glBindBuffer(GL_ARRAY_BUFFER, m_sector_outline_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof curve_vertices, curve_vertices, GL_DYNAMIC_DRAW);
+		unsigned int attrib_flat_position = m_flat_shader.getAttributeLocation("coord");
+		glEnableVertexAttribArray(attrib_flat_position);
+		glVertexAttribPointer(attrib_flat_position, 4, GL_FLOAT, GL_FALSE, 0, 0);
+		glDrawArrays(GL_LINE_STRIP, 0, CURVE_SUBDIVS + 1);
+		
+	}
+
 
 	void GLBackend::drawSector(float cx, float cy, float start_angle, float end_angle, float radius1, float radius2, const Brush & brush)
 	{
@@ -658,6 +715,33 @@ namespace graphics
 		return m_fontlib.setCurrentFont(fontname);
 	}
 
+	bool GLBackend::updateBitmapData(const std::string& bitmap_name, const unsigned char* buffer)
+	{
+		Texture* p_tex = textures.getTextureObject(bitmap_name);
+		if (!p_tex)
+			return false;
+		
+		unsigned char * bitmap_buffer = p_tex->getDataPtr();
+		if (buffer)
+			memcpy(bitmap_buffer, buffer, 4 * p_tex->getWidth() * p_tex->getHeight());
+
+		p_tex->updateGLTexture();
+
+		return true;
+	}
+
+	bool GLBackend::getBitmapData(const std::string& bitmap_name, unsigned char** buffer, unsigned int* width, unsigned int* height)
+	{
+		Texture *p_tex = textures.getTextureObject(bitmap_name);
+		if (!p_tex)
+			return false;
+		
+		*buffer = p_tex->getDataPtr();
+		*width = p_tex->getWidth();
+		*height = p_tex->getHeight();
+		return true;
+	}
+
 	bool GLBackend::getKeyState(scancode_t key)
 	{
 		int numkeys;
@@ -682,7 +766,7 @@ namespace graphics
 			}
 		}
 		update();
-		if (m_idle_callback != nullptr)
+		if (m_idle_callback)
 			m_idle_callback(getDeltaTime());
 		draw();
 		advanceTime();
@@ -774,6 +858,10 @@ namespace graphics
 
 	void GLBackend::draw()
 	{
+		
+		glClearColor(0.0f, 0.0f, 0.f, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		m_flat_shader.use();
 
 		// reset timers on first run
@@ -794,8 +882,6 @@ namespace graphics
 				
 		glDepthMask(0.0f);
 		glDisable(GL_DEPTH_TEST);
-		glClearColor(0.0f, 0.0f, 0.f, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		if (m_canvas_mode == CANVAS_SCALE_FIT)
 		{
@@ -815,6 +901,19 @@ namespace graphics
 		bck.outline_opacity = 0.0f;
 		drawRect(m_requested_canvas.z / 2, m_requested_canvas.w / 2, m_requested_canvas.z, m_requested_canvas.w, bck);
 		
+		if (m_predraw_callback)
+		{
+			// Pre-draw callback for arbitrary geometry
+			m_predraw_callback();
+
+			// switch back to 2D drawing state
+			m_flat_shader.use();
+			glEnable(GL_SCISSOR_TEST);
+			glDepthMask(0.0f);
+			glDisable(GL_DEPTH_TEST);
+			
+		}
+
 		glEnable(GL_BLEND);
 		glBlendEquation(GL_ADD);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -829,6 +928,13 @@ namespace graphics
 		m_fontlib.commitText();
 
 		glDisable(GL_SCISSOR_TEST);
+
+		if (m_postdraw_callback)
+		{
+			// post-draw callback for arbitrary geometry
+			m_postdraw_callback();
+		}
+
 		swap();
 	}
 
@@ -837,6 +943,16 @@ namespace graphics
 	void GLBackend::setDrawCallback(std::function<void()> drf)
 	{
 		m_draw_callback = drf;
+	}
+
+	void GLBackend::setPreDrawCallback(std::function<void()> drf)
+	{
+		m_predraw_callback = drf;
+	}
+
+	void GLBackend::setPostDrawCallback(std::function<void()> drf)
+	{
+		m_postdraw_callback = drf;
 	}
 
 	void GLBackend::setIdleCallback(std::function<void(float)> idf)

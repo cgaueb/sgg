@@ -75,7 +75,7 @@ namespace graphics
 														   ///< mapped to the circumferance of the disk, while the height is mapped to
 														   ///< the disk radius. 
 														   ///< \image html uv.jpg
-
+														   
 		bool gradient = false;							   ///< Enables or disables the gradient fill of a shape.
 														   ///<
 
@@ -388,6 +388,26 @@ namespace graphics
 	*/
 	void setDrawFunction(std::function<void()> draw);
 
+	/** Specifies a function to call prior to entering the 2D rendering draw call. 
+
+	The pre-draw function is useful when one needs to render 3D content or call custom rendering functionality
+	prior to drawing a 2D overlay over it. For example, one can use typical 3D graphics to render a 3D game view
+	and overlay the 3D view with a GUI created with SGG.
+
+	\param predraw is the user-defined draw function passed to call.
+	*/
+	void setPreDrawFunction(std::function<void()> predraw);
+
+	/** Specifies a function to call after entering the 2D rendering draw call.
+
+	The post-draw function is useful when one needs to render 3D content or call custom rendering functionality
+	that is going to write over the 2D canvas typically generated with SGG functions. 
+	For example, one can use SGG to draw a GUI and draw a custom video overlay as a post-draw operation over some part of it.
+
+	\param postdraw is the user-defined draw function passed to call.
+	*/
+	void setPostDrawFunction(std::function<void()> postdraw);
+
 	/** Specifies a user-defined function to be called each time the state of the application needs to be updated.
 
 	This callback function is invoked a) when an input event is triggered in the event processing loop of the engine,
@@ -551,6 +571,23 @@ namespace graphics
 	*/
 	void drawRect(float center_x, float center_y, float width, float height, const Brush & brush);
 
+	/** Draws a bezier segment.
+
+		Draws a 3rd order bezier segment between two end-points on the canvas, 
+		using two intermediate control points to distort the curve.
+		The outline attributes are specified in the brush parameter.
+
+		\param ep1 is an array containing the x and y coordinates of the first end point, in canvas units.
+		\param cp1 is an array containing the x and y coordinates of the first control point, in canvas units.
+		\param cp2 is an array containing the x and y coordinates of the second control point, in canvas units.
+		\param ep2 is an array containing the x and y coordinates of the second end point, in canvas units.
+		\param brush specifies the drawing attributes to use for the outline and fill of the shape.
+
+		\see Brush
+	*/
+	void drawBezier(float *ep1, float *cp1, float *cp2, float *ep2, const Brush& brush);
+
+
 	/** Draws a line segment.
 
 		Draws a linear segment between two points on the canvas.
@@ -692,6 +729,12 @@ namespace graphics
 	*/
 	void resetPose();
 	
+	/** @}*/
+
+	/** \defgroup _MANIPULATION Bitmap Manipulation
+	* @{
+	*/
+
 	/** Loads all PNG bitmaps located in a directory specified by the argument dir at once. 
 	
 		Preloading image assets prior to actually requesting a draw call with a brush that
@@ -739,7 +782,52 @@ namespace graphics
 		\return a vector of the full path names to the individual bitmaps identified and successfully loaded. The 
 		path names will include the directory name given.
 	*/
-	std::vector<std::string> preloadBitmaps(std::string dir);
+	std::vector<std::string> preloadBitmaps(const std::string & dir);
+
+	/** Get the internally stored image buffer of the bitmap, along with the width and height of the internally stored image.
+		
+		The size of the image buffer is not necessarily the same with that of the requested bitmap to load, since
+		SGG internally makes the image dimensions powers of two. The reported width and height are therefore the corrected dimensions. 
+		The image can be used for obtaining the data to a bitmap used as texture in the engine and modify its contents.
+		The number of channels in the image buffer are always expected to be 4 (red, green, blue and opacity - alpha).  
+
+		\param bitmap_name is the name of the bitmap as loaded and indexed by SGG.
+		
+		\param buffer is a pointer to an unsigned char array to pass the internal address of the image buffer to. Warning, the
+		data can be directly modified. 
+
+		\param width is a pointer to an unsigned int variable to store the width of the image buffer.
+
+		\param height is a pointer to an unsigned int variable to store the height of the image buffer.
+
+		\return true if the requested bitmap was located and its data were successfully retrieved, false otherwise.
+
+		\see updateBitmapData
+	*/
+	bool getBitmapData(const std::string & bitmap_name, unsigned char ** buffer, unsigned int * width, unsigned int * height);
+
+	/** Update the internally stored image buffer data of a bitmap.
+
+		The function passes an image buffer to SGG to replace the data of an existing bitmap. The expected dimensions of the buffer can be
+		obtained using the getBitmapData function. 
+		The number of channels in the image buffer are always expected to be 4 (red, green, blue and opacity - alpha).
+		The size of the image buffer is not necessarily the same with that of the requested bitmap to load, since
+		SGG internally makes the image dimensions powers of two. The reported width and height are therefore the corrected dimensions.
+		The image can be used for obtaining the data to a bitmap used as texture in the engine, modify its contents and update it
+		using the updateBitmapData function.
+
+		\param bitmap_name is the name of the bitmap as loaded and indexed by SGG.
+
+		\param buffer is an unsigned char array to copy the image data from. If nullptr, no pixel copy is performed, but the 
+		texture is nevertheless rebuilt. This is useful for reloading the internal image buffer to the graphics back end, after 
+		directly modifying the texture data using the pointer returned by getBitmapData.
+
+		\return true if the requested bitmap was located and its data were successfully updated, false otherwise.
+
+		\see getBitmapData
+	*/
+	bool updateBitmapData(const std::string& bitmap_name, const unsigned char* buffer);
+
 
 	/** @}*/
 
