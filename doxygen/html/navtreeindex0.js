@@ -1,0 +1,21 @@
+var NAVTREEINDEX0 =
+{
+"index.html":[],
+"index.html#About":[2],
+"index.html#Features":[1],
+"index.html#Introduction":[0],
+"index.html#sub_dependencies":[2,1],
+"index.html#sub_licensing":[2,0],
+"page_building_sgg.html":[3],
+"page_building_sgg.html#autotoc_md2":[3,2,0],
+"page_building_sgg.html#building_sgg_cmake":[3,2],
+"page_building_sgg.html#building_sgg_linux_gcc":[3,1],
+"page_building_sgg.html#building_sgg_windows_msvc":[3,0],
+"page_building_with_sgg.html":[4],
+"page_building_with_sgg.html#using_sgg_linux":[4,1],
+"page_building_with_sgg.html#using_sgg_windows":[4,0],
+"page_building_with_sgg.html#using_sgg_windows_cmd":[4,0,1],
+"page_building_with_sgg.html#using_sgg_windows_vs":[4,0,0],
+"page_simple_app.html":[5],
+"pages.html":[]
+};
