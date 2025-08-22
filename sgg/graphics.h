@@ -74,7 +74,7 @@ namespace graphics
 														   ///< imagety generated on the fly (e.g. the computation of a water-fx reflection, a 
 														   ///< ray traced image, an processed raster and so on). To specify an empty texture,
 														   ///< one needs to use a special name convention for the texture to initialize:
-														   ///< @name:widthXheight. For example: "@Tex1:400X200". When referencing the texture,
+														   ///< "@name:widthXheight". For example: "@Tex1:400X200". When referencing the texture,
 														   ///< one should use the entire string, as usual. The internal resolution of the 
 														   ///< allocated buffer is changed to be of power-of-two dimensions, as usual. Therefore,
 														   ///< regardless of the specified resolution in the texture name string, one should 
