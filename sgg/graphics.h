@@ -68,6 +68,21 @@ namespace graphics
 														   ///< used. When an image filename is provided, it is loaded once and 
 														   ///< internally cached for repeated use. 
 														   ///< 
+														   ///< Alternatively, one may request the use of an empty texture, instead of 
+														   ///< loading a bitmap from a file. This is a powerful option, when the application is 
+														   ///< going to update the texture with custom data, later on, or fill the texture with
+														   ///< imagety generated on the fly (e.g. the computation of a water-fx reflection, a 
+														   ///< ray traced image, an processed raster and so on). To specify an empty texture,
+														   ///< one needs to use a special name convention for the texture to initialize:
+														   ///< @name:widthXheight. For example: "@Tex1:400X200". When referencing the texture,
+														   ///< one should use the entire string, as usual. The internal resolution of the 
+														   ///< allocated buffer is changed to be of power-of-two dimensions, as usual. Therefore,
+														   ///< regardless of the specified resolution in the texture name string, one should 
+														   ///< always query the buffer size and use these metrics when attempting to read from or 
+														   ///< write to that buffer.
+														   ///< \see updateBitmapData
+														   ///< \see getBitmapData
+														   ///<
 														   ///< Keep in mind that when using a bitmap on a drawable shape, the 
 														   ///< image parametric space (expressed as u,v coordinates in the image below)
 														   ///< is mapped to corresponding parameters of the underlying shape.

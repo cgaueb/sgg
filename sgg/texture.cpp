@@ -69,10 +69,30 @@ void graphics::Texture::updateGLTexture()
 }
 
 graphics::Texture::Texture(const std::string & filename)
+	: m_channels(4), m_height(0), m_width(0)
 {
 	m_filename = filename;
-	if (!load(filename))
-		return;
+
+	if (filename[0] == '@')
+	{
+		// The user requested an empty texture initialization
+		size_t pos = filename.find(':');
+		if (pos == std::string::npos)
+			return;
+		size_t delim = filename.find('X');
+
+		std::string sz = filename.substr(pos + 1, delim - pos - 1);
+		m_width = std::stoi(sz);
+		sz = filename.substr(delim + 1);
+		m_height = std::stoi(sz);
+		m_buffer.resize(4*m_height*m_width);
+	}
+	else
+	{
+		if (!load(filename))
+			return;
+	}
+
 	makePowerOfTwo();
 	buildGLTexture();
 }

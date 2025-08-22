@@ -319,7 +319,7 @@ using namespace graphics
 
 A minimal main application should look like this:
 \code{.cpp}
-#include "graphics.h"
+#include <sgg/graphics.h> // Note that the sgg directory is required.
 
 // The custom callback function that the library calls 
 // to check for and set the current application state.
