@@ -47,7 +47,7 @@ void Shader::printLog(unsigned int object)
 	printf("%s", log);
 	delete[] log;
 }
-Shader::Shader(const char * vertex, const char * fragment)
+Shader::Shader(const char * vertex, const char * fragment, const char * geometry)
 {
 
 	if (!vertex || !fragment)
@@ -58,6 +58,12 @@ Shader::Shader(const char * vertex, const char * fragment)
 
 	fshader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fshader, 1, &fragment, NULL);
+
+	if (geometry)
+	{
+		gshader = glCreateShader(GL_GEOMETRY_SHADER);
+		glShaderSource(gshader, 1, &geometry, NULL);
+	}
 
 	GLint status;
 
@@ -76,10 +82,25 @@ Shader::Shader(const char * vertex, const char * fragment)
 		return;
 	}
 
+	if (geometry)
+	{
+		glCompileShader(gshader);
+		glGetShaderiv(gshader, GL_COMPILE_STATUS, &status);
+		if (!status)
+		{
+			printLog(gshader);
+			return;
+		}
+	}
+
 	program = glCreateProgram();
 	glAttachShader(program, vshader);
 	glAttachShader(program, fshader);
+	if (geometry)
+		glAttachShader(program, gshader);
+
 	glLinkProgram(program);
+
 	assert(glGetError() == GL_NO_ERROR);
 //	GLint status;
 
@@ -162,6 +183,11 @@ Shader::~Shader()
 	glDeleteShader(vshader);
 	glDetachShader(program, fshader);
 	glDeleteShader(fshader);
+	if (gshader > 0)
+	{
+		glDetachShader(program, gshader);
+		glDeleteShader(gshader);
+	}
 	
 }
 

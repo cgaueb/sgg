@@ -38,7 +38,7 @@ class Shader
 	bool ready = false;
 	
 	
-	unsigned int vshader, fshader;
+	unsigned int vshader, fshader, gshader;
 
 protected:
 	void printLog(unsigned int obj);
@@ -46,7 +46,7 @@ protected:
 public:
 	unsigned int program;
 	explicit operator bool () const { return ready; }
-	Shader(const char * vertex = nullptr, const char * fragment = nullptr);
+	Shader(const char * vertex = nullptr, const char * fragment = nullptr, const char* geometry = nullptr);
 	Uniform & operator [] (const char * name);
 	bool use(bool use = true);
 	std::string loadShaderText(char * file);
