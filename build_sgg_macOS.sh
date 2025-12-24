@@ -2,6 +2,8 @@
 
 # @gsiros modifications
 
+set -xe
+
 CC=g++
 LD=g++
 AR=ar
