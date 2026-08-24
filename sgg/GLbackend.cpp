@@ -195,7 +195,6 @@ namespace graphics
 
 		if (event.type == SDL_MOUSEMOTION)
 		{
-			m_prev_mouse_pos = m_mouse_pos;
 			m_mouse_pos.x = event.motion.x;
 			m_mouse_pos.y = event.motion.y;
 			m_mouse_dragging = (m_button_state[0] || m_button_state[1] || m_button_state[2]);
@@ -234,7 +233,6 @@ namespace graphics
 				}
 			}
 		}
-		
 		return true;
 	}
 
@@ -754,6 +752,8 @@ namespace graphics
 	{
 		SDL_Event event;
 		bool loop = true;
+		m_prev_mouse_pos = m_mouse_pos;
+
 		while (SDL_PollEvent(&event) && loop)
 		{
 			if (event.type == SDL_WINDOWEVENT_CLOSE || event.type == SDL_QUIT)
@@ -839,6 +839,7 @@ namespace graphics
 		}
 
 		computeProjection();
+		glScissor(0, 0, m_width, m_height);
 		glViewport(0, 0, m_width, m_height);
 		//SDL_Delay(100);
 		draw();

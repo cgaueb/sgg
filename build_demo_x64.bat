@@ -19,6 +19,10 @@ IF EXIST "%STUDIO_PATH_X64%\2022\" (
 set STUDIO_VERSION=2022
 set STUDIO_PATH=C:\Program Files\Microsoft Visual Studio
 )
+IF EXIST "%STUDIO_PATH_X64%\18\" (
+set STUDIO_VERSION=18
+set STUDIO_PATH=C:\Program Files\Microsoft Visual Studio
+)
 IF EXIST "%STUDIO_PATH%\%STUDIO_VERSION%\Enterprise" (
 set STUDIO_EDITION=Enterprise
 )
@@ -30,7 +34,7 @@ set STUDIO_EDITION=Community
 )
 
 IF %STUDIO_VERSION% == None (
-    echo "Wrong Visual Studio Version Installed (2017, 2019 or 2022 required)"
+    echo "Wrong Visual Studio Version Installed (2017, 2019, 2022 or 2026 required)"
     EXIT /B 1
 )
 

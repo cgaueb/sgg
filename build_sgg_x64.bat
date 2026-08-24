@@ -24,6 +24,9 @@ set STUDIO_PATH=C:\Program Files\Microsoft Visual Studio
 )
 IF EXIST "%STUDIO_PATH_X64%\2026\" (
 set STUDIO_VERSION=2026
+)
+IF EXIST "%STUDIO_PATH_X64%\18\" (
+set STUDIO_VERSION=18
 set STUDIO_PATH=C:\Program Files\Microsoft Visual Studio
 )
 IF EXIST "%STUDIO_PATH%\%STUDIO_VERSION%\Enterprise" (
