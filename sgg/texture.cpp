@@ -57,6 +57,7 @@ void graphics::Texture::buildGLTexture()
 	glTexImage2D(GL_TEXTURE_2D, 0, 4, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &m_buffer[0]);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	m_buffer.clear();
 }
 
 void graphics::Texture::updateGLTexture()
