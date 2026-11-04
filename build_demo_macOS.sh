@@ -2,6 +2,8 @@
 
 # @gsiros modifications of @ViNeek's make file.
 
+set -xe
+
 CC=g++
 LD=g++
 BUILD_PATH="build/Release"
